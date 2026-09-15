@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Riati — Live Clinical Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --aub:#4F2D57; --aub-d:#2E1834; --cream:#FAF7F3; --lilac:#EDE6F2; --line:#E6DDE9;
+  --gold:#B8892E; --ink:#1F1520; --mut:#6B5C70; --body:#4A3B4E;
+  --green:#1F6F5B; --amber:#C9822B; --red:#A8323E;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;padding:0;background:var(--cream);color:var(--ink);-webkit-font-smoothing:antialiased}
+body{font-family:'IBM Plex Sans Arabic','Newsreader',system-ui,sans-serif;font-size:14px}
+a{color:var(--aub);text-decoration:none}
+input,select,button{font:inherit}
+input[type=number]{direction:ltr;text-align:center}
+input:focus,select:focus{outline:2px solid var(--aub);outline-offset:1px}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+@keyframes pop{from{opacity:0;transform:scale(.4)}to{opacity:1;transform:none}}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(168,50,62,.5)}50%{box-shadow:0 0 0 12px rgba(168,50,62,0)}}
+@keyframes breathe{0%,100%{transform:scale(1);opacity:.5}50%{transform:scale(1.5);opacity:1}}
+.serif{font-family:'Newsreader','Amiri',serif;font-weight:400}
+.kicker{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-weight:600}
+.card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:20px;animation:rise .7s cubic-bezier(.2,.7,.2,1) both}
+.btn{border:1px solid #D9CCE3;background:transparent;color:var(--aub);border-radius:999px;padding:8px 16px;font-size:13px;cursor:pointer}
+.btn:hover{background:var(--lilac)}
+.btn-primary{background:var(--aub);color:var(--cream);border:0}
+.btn-primary:hover{background:var(--aub-d)}
+.btn-danger{background:var(--red);color:#fff;border:0}
+.seg{display:inline-flex;gap:4px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px}
+.seg button{border:0;border-radius:999px;padding:6px 13px;font-size:13px;cursor:pointer;background:transparent;color:var(--aub)}
+.seg button.on{background:var(--aub);color:var(--cream)}
+.num{width:64px;border:1px solid #D9CCE3;border-radius:8px;padding:4px 6px;font-size:13px;background:var(--cream);color:var(--ink)}
+.num.small{width:52px}
+select.sel{border:1px solid #D9CCE3;border-radius:8px;padding:5px 8px;font-size:13px;background:var(--cream);color:var(--ink);max-width:100%}
+.tile{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px 16px 10px;position:relative;overflow:hidden}
+.tile .lbl{font-size:12px;color:var(--mut)}
+.tile .val{font-family:'Newsreader',serif;font-size:34px;color:var(--aub-d);line-height:1.1;margin:2px 0 0}
+.tile .val small{font-size:14px;color:var(--mut)}
+.tile .sub{font-size:11px;color:var(--mut);min-height:14px}
+.tile.warn{border-color:var(--amber)}
+.tile.crit{border-color:var(--red);animation:pulse 2s infinite}
+.log-entry{border:1px solid var(--line);border-radius:14px;padding:12px 14px;background:#fff;animation:rise .45s both}
+.log-entry .lt{font-size:11px;color:var(--mut)}
+.log-entry .ttl{font-size:14px;font-weight:600;color:var(--aub-d);margin:2px 0}
+.log-entry .bd{font-size:13px;color:var(--body);line-height:1.55}
+.log-entry.e-alert{border-inline-start:4px solid var(--amber)}
+.log-entry.e-alarm{border-inline-start:4px solid var(--red);background:#FDF4F5}
+.log-entry.e-therapy{border-inline-start:4px solid var(--aub)}
+.log-entry.e-report{border-inline-start:4px solid var(--gold);background:#FDFBF6}
+.log-entry.e-ai{border-inline-start:4px solid var(--line)}
+.rep-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin:10px 0}
+.rep-cell{background:var(--cream);border-radius:10px;padding:8px 10px}
+.rep-cell .k{font-size:11px;color:var(--mut)}
+.rep-cell .v{font-family:'Newsreader',serif;font-size:19px;color:var(--aub-d)}
+.rep-cell .r{font-size:11px;color:var(--mut)}
+.zonechip{display:inline-flex;align-items:center;gap:7px;border-radius:999px;padding:5px 12px;font-size:12px;font-weight:600;color:#fff}
+.rule{display:flex;flex-wrap:wrap;align-items:center;gap:6px;border-top:1px solid var(--line);padding:10px 0;font-size:13px;color:var(--body)}
+.rule .word{color:var(--mut);font-size:12px}
+.rule .metr{font-weight:600;color:var(--aub-d)}
+.rule .act{color:var(--aub);font-weight:600}
+.rule .cite{font-size:10px;letter-spacing:.06em;color:var(--gold);border:1px solid var(--gold);border-radius:999px;padding:1px 7px}
+.rule.off{opacity:.42}
+.switch{appearance:none;width:34px;height:20px;border-radius:999px;background:#D9CCE3;position:relative;cursor:pointer;flex:none;margin:0}
+.switch:checked{background:var(--green)}
+.switch::after{content:'';position:absolute;top:2px;inset-inline-start:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform .2s}
+.switch:checked::after{transform:translateX(14px)}
+[dir=rtl] .switch:checked::after{transform:translateX(-14px)}
+.chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 14px;font-size:12px;cursor:pointer;color:var(--aub)}
+.chip.on{background:var(--aub);color:var(--cream);border-color:var(--aub)}
+#alarmbar{position:sticky;top:0;z-index:90;display:none;background:var(--red);color:#fff;padding:12px 20px;align-items:center;gap:14px;animation:pulse 1.6s infinite}
+#alarmbar.show{display:flex}
+#alarmbar .t{font-weight:600;font-size:15px;flex:1}
+header.top{position:sticky;top:0;z-index:80;background:rgba(250,247,243,.92);backdrop-filter:blur(14px);border-bottom:1px solid var(--line);border-top:3px dashed var(--gold)}
+.wrap{max-width:1280px;margin:0 auto;padding-inline:20px}
+.hrow{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding-block:10px}
+main{max-width:1280px;margin:0 auto;padding:22px 20px 60px;display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:20px;align-items:start}
+@media(max-width:980px){main{grid-template-columns:1fr}}
+.col{display:flex;flex-direction:column;gap:20px;min-width:0}
+footer{border-top:1px solid var(--line);background:#fff}
+footer .wrap{padding-block:26px;font-size:12.5px;color:var(--mut);line-height:1.7}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--green);display:inline-block;animation:breathe 2.4s ease-in-out infinite}
+h3.cardt{margin:0 0 4px;font-family:'Newsreader','Amiri',serif;font-weight:400;font-size:22px;color:var(--aub-d)}
+.mut{color:var(--mut)}
+.tiny{font-size:12px;color:var(--mut);line-height:1.55}
+</style>
+</head>
+<body>
+
+<header class="top"><div class="wrap hrow">
+  <a href="Riati.dc.html" style="display:flex;align-items:center;gap:9px">
+    <img src="assets/logo.png" alt="Riati" style="width:36px;height:36px;object-fit:contain">
+    <span class="serif" style="font-size:19px;color:var(--aub)">Riati <span style="color:var(--gold);font-weight:300">|</span> <span style="font-family:'Amiri',serif">رئتي</span></span>
+  </a>
+  <span class="kicker" id="hSub"></span>
+  <div style="margin-inline-start:auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+    <div class="serif" id="clock" style="font-size:20px;color:var(--aub-d);min-width:130px;text-align:center" dir="ltr">Day 1 · 08:00</div>
+    <div class="seg" id="speedSeg"></div>
+    <button class="btn btn-primary" id="playBtn"></button>
+    <button class="btn" id="resetBtn"></button>
+    <button class="btn" id="langBtn"></button>
+  </div>
+</div></header>
+
+<div id="alarmbar"><span style="font-size:22px">⏺</span><span class="t" id="alarmTxt"></span><button class="btn" style="background:#fff;color:var(--red);border:0" id="ackBtn"></button></div>
+
+<main>
+<div class="col">
+  <!-- patient -->
+  <div class="card" style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:16px 20px">
+    <div style="width:48px;height:48px;border-radius:50%;background:var(--lilac);display:grid;place-items:center" class="serif"><span style="font-size:22px;color:var(--aub)" id="pInitial">A</span></div>
+    <div style="flex:1;min-width:220px">
+      <div style="font-weight:600;color:var(--aub-d);font-size:16px" id="pName"></div>
+      <div class="tiny" id="pLine"></div>
+    </div>
+    <span style="border:1px dashed var(--gold);color:var(--gold);border-radius:999px;padding:5px 12px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:600" id="pSim"></span>
+    <span class="zonechip" id="news2Chip" hidden style="animation:pulse 2s infinite" dir="ltr"></span>
+    <span class="zonechip" id="zoneChip"></span>
+  </div>
+
+  <!-- vitals -->
+  <div>
+    <div class="kicker" style="margin:2px 0 10px" id="kMon"></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px" id="tiles"></div>
+  </div>
+
+  <!-- chart -->
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:6px">
+      <div class="serif" style="font-size:20px;color:var(--aub-d)" id="chTitle"></div>
+      <div style="display:flex;gap:14px;font-size:11px;color:var(--mut);flex-wrap:wrap" id="chLegend"></div>
+    </div>
+    <div id="chart"></div>
+  </div>
+
+  <!-- log -->
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+      <h3 class="cardt" id="kLog"></h3>
+      <div style="display:flex;gap:6px;flex-wrap:wrap" id="filters"></div>
+    </div>
+    <div id="log" style="display:flex;flex-direction:column;gap:10px;max-height:560px;overflow-y:auto"></div>
+  </div>
+</div>
+
+<div class="col">
+  <!-- AI -->
+  <div class="card" style="background:var(--aub-d);border-color:var(--aub-d);color:var(--cream)">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+      <span class="dot"></span>
+      <div class="serif" style="font-size:22px" id="kAI"></div>
+    </div>
+    <div style="font-size:13px;color:#C9B8D1;line-height:1.55" id="aiStatus"></div>
+    <div style="background:rgba(255,255,255,.06);border:1px solid rgba(217,204,227,.2);border-radius:14px;padding:12px 14px;margin-top:12px">
+      <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#D4B26A;font-weight:600" id="aiLastL"></div>
+      <div style="font-size:13.5px;line-height:1.55;margin-top:5px" id="aiLast">—</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;margin-top:12px;flex-wrap:wrap">
+      <div style="flex:1;min-width:150px">
+        <div style="font-size:11px;color:#C9B8D1" id="nextRepL"></div>
+        <div class="serif" style="font-size:20px" id="nextRep" dir="ltr">—</div>
+      </div>
+      <select class="sel" id="repInt" style="background:rgba(255,255,255,.08);border-color:rgba(217,204,227,.3);color:var(--cream)"></select>
+      <button class="btn" style="border-color:rgba(217,204,227,.4);color:var(--cream)" id="repNowBtn"></button>
+    </div>
+  </div>
+
+  <!-- standing orders -->
+  <div class="card">
+    <h3 class="cardt" id="kOrders"></h3>
+    <p class="tiny" style="margin:0 0 8px" id="ordersNote"></p>
+    <div style="background:var(--cream);border-radius:14px;padding:12px 14px;margin-bottom:6px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <input type="checkbox" class="switch" id="o2on" checked>
+        <span style="font-weight:600;color:var(--aub-d);font-size:13px" id="o2title"></span>
+        <span class="rule cite" style="border:1px solid var(--gold);color:var(--gold);border-radius:999px;padding:1px 7px;font-size:10px">AARC 2022</span>
+      </div>
+      <div class="tiny" style="margin-top:6px;display:flex;flex-wrap:wrap;gap:4px;align-items:center" id="o2words"></div>
+    </div>
+    <div id="rules"></div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;border-top:1px solid var(--line);padding-top:12px;margin-top:2px" id="addRow"></div>
+    <div style="display:flex;justify-content:flex-end;margin-top:10px"><button class="btn" id="resetOrdersBtn" style="font-size:12px"></button></div>
+  </div>
+
+  <!-- direct actions -->
+  <div class="card">
+    <h3 class="cardt" id="kTher"></h3>
+    <p class="tiny" style="margin:0 0 10px" id="therNote"></p>
+    <div style="display:flex;flex-wrap:wrap;gap:8px" id="therBtns"></div>
+    <div style="display:flex;align-items:center;gap:10px;margin-top:12px;flex-wrap:wrap">
+      <span style="font-size:13px;color:var(--body)" id="o2lbl"></span>
+      <div class="seg"><button id="o2minus" dir="ltr">−1</button><button id="o2plus" dir="ltr">+1</button></div>
+      <span class="serif" style="font-size:22px;color:var(--aub-d)" id="o2now" dir="ltr">0 L/min</span>
+      <button class="btn" id="o2stop" style="font-size:12px"></button>
+    </div>
+  </div>
+
+  <!-- scenario -->
+  <div class="card">
+    <h3 class="cardt" id="kScen"></h3>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px" id="scenBtns"></div>
+    <div style="margin-top:14px">
+      <label style="display:block;font-size:12px;color:var(--mut)"><span id="slDetL"></span> <span id="slDetV" class="mut"></span>
+      <input type="range" id="slDet" min="50" max="160" value="100" style="width:100%;accent-color:var(--aub)"></label>
+      <label style="display:block;font-size:12px;color:var(--mut);margin-top:8px"><span id="slRespL"></span> <span id="slRespV" class="mut"></span>
+      <input type="range" id="slResp" min="0" max="100" value="85" style="width:100%;accent-color:var(--aub)"></label>
+    </div>
+    <p class="tiny" style="margin:10px 0 0" id="scenNote"></p>
+  </div>
+</div>
+</main>
+
+<footer><div class="wrap">
+  <div id="ftCites"></div>
+  <div style="margin-top:8px" id="ftDisc"></div>
+</div></footer>
+
+<script>
+'use strict';
+/* ================= i18n ================= */
+const T = {
+en: {
+  hSub:'Live clinical demo', langBtn:'العربية', play:'Run', pause:'Pause', reset:'Reset', day:'Day',
+  pName:'Ahmad M. — demo participant', pLine:'63 years · COPD (GOLD III) · known CO₂ retainer · baseline SpO₂ 92–94% on room air · baseline Borg 2', pSim:'Simulated data',
+  kMon:'Live monitor · one reading per minute', chTitle:'SpO₂ and heart rate · last 3 hours',
+  lSpo2:'SpO₂ %', lHr:'Heart rate', lThr:'SpO₂ target floor 88%', lHr140:'HR limit 140', lFlag:'Flagged reading', lRx:'Therapy given',
+  vSpo2:'SpO₂', vHr:'Heart rate', vRr:'Resp. rate', vSbp:'Systolic BP', vTemp:'Temperature', vBorg:'Dyspnea · Borg', vNews:'NEWS2 score',
+  uPct:'%', uBpm:'bpm', uMin:'/min', uMmhg:'mmHg', uC:'°C', uB:'/10', onO2:'on O₂', air:'room air',
+  zoneG:'Green · Routine', zoneA:'Amber · Contact team', zoneR:'Red · Urgent action',
+  n2Urgent:'urgent review', n2Emerg:'emergency response',
+  kAI:'Riati AI monitor', aiStatus:'Reads every reading the minute it arrives, acts only inside the physician’s signed standing orders below, and logs everything it does.',
+  aiLastL:'Latest assessment', nextRepL:'Next report to physician', repNow:'Send report now',
+  int15:'Report every 15 min', int30:'Report every 30 min', int60:'Report every hour', int120:'Report every 2 hours',
+  kOrders:'Physician standing orders', ordersNote:'The AI may only act within these editable, signed orders. Change a threshold and it applies from the next reading.',
+  o2title:'Oxygen titration protocol',
+  o2w1:'Start', o2w2:'L/min when SpO₂ <', o2w3:'% for 3 min. Adjust ±1 L/min every 10 min to hold', o2w4:'–', o2w5:'%. Max', o2w6:'L/min. Humidify above 4 L/min.',
+  ifW:'IF', forW:'for', minW:'min', arrW:'→',
+  mspo2:'SpO₂', mhr:'HR', mrr:'RR', msbp:'SBP', mtemp:'Temp', mborg:'Borg', mnews2:'NEWS2',
+  aSalb:'Salbutamol 2.5 mg neb', aIpra:'Ipratropium 0.5 mg neb', aPred:'Prednisone 40 mg PO', aO2:'Start O₂ protocol', aNotify:'Notify physician (urgent)', aAlarm:'Emergency alarm', aHold:'Hold SABA 60 min + notify',
+  addRule:'Add order', del:'Remove', resetOrders:'Reset orders to guideline defaults',
+  kTher:'Direct physician actions', therNote:'Anything given here is recorded exactly like an AI-administered order, and its response is checked the same way.',
+  o2lbl:'Oxygen flow', o2stopB:'Stop O₂',
+  kScen:'Scenario · adjustable', scM:'Routine day — brief episodes, AI treats, patient recovers', scS:'Severe AECOPD — poor response', scSt:'Stable night',
+  slDetL:'Episode intensity', slRespL:'Therapy responsiveness', scenNote:'In the routine day the patient is stable most of the time; when a brief episode starts, the AI treats it within the standing orders and the patient recovers. Switching scenario restarts the simulation; sliders act live — drop responsiveness to watch therapy fail and the escalation chain fire.',
+  kLog:'Reports & event log', fAll:'All', fRep:'Reports', fTher:'Therapies', fAl:'Alerts & alarms',
+  ackB:'Acknowledge', eAck:'Alarm acknowledged by physician',
+  eO2Start:f=>`O₂ started at ${f} L/min via nasal cannula`, eO2Up:f=>`O₂ increased to ${f} L/min — SpO₂ below target band`, eO2Down:f=>`O₂ reduced to ${f} L/min — SpO₂ above 92% (hypercapnia precaution)`, eO2StopT:'O₂ stopped — SpO₂ held in target on minimal flow', eHumid:'Flow above 4 L/min — humidification added per AARC',
+  eGive:n=>`${n} administered`, byAI:'per standing order', byDoc:'direct physician order',
+  eEff:(n,w)=>`${n} judged effective — ${w}`, eIneff:(n,m)=>`${n} NOT effective after ${m} min — escalation required`,
+  wBorg:'dyspnea and respiratory rate improving', wSpo2:'SpO₂ back inside 88–92% target',
+  eSabaMax:'Three nebulisations inside one hour — AI paused further doses, physician review requested',
+  eHold:v=>`Heart rate above ${v} bpm sustained — SABA held for 60 min, physician notified`,
+  eNews7:v=>`NEWS2 reached ${v} — emergency response triggered`, eNews5:v=>`NEWS2 at ${v} — urgent clinical review requested`,
+  eO2Max:'Maximum O₂ flow reached and SpO₂ still below target — immediate clinical review',
+  eTemp:v=>`Temperature ${v}°C — physician notified (assess for infective exacerbation)`,
+  eRuleFire:(m,o,v)=>`Standing order matched: ${m} ${o} ${v}`,
+  repTitle:(a,b)=>`Report to physician · ${a} – ${b}`, repExc:'EXCEPTION REPORT — therapy not effective',
+  rNow:'now', rRange:'range', rTherapies:'Therapies this period', rNone:'No therapies this period', rAlerts:'alerts', rAlarms:'alarms',
+  rAssess:'Assessment', rRec:'Recommendation',
+  recG:'Continue routine monitoring per the signed plan.', recA:'Contact the patient within the stated time and review therapy response.', recR:'Immediate clinical review required. The patient has been shown the approved emergency instructions, including 997.',
+  respEff:'effective', respIneff:'INEFFECTIVE', respPend:'response check pending',
+  ftCites:'Default thresholds derive from published guidance: AARC Clinical Practice Guideline — Oxygen in the Acute Care Setting (2022): SpO₂ 88–92% for COPD, humidify >4 L/min · GOLD 2026 Report: SABA first-line in exacerbation, systemic corticosteroid ≤5 days · Royal College of Physicians NEWS2: score 5–6 urgent review, ≥7 emergency response, Scale 2 for hypercapnic patients.',
+  ftDisc:'Research prototype with a fully simulated patient. Not a medical device and not clinical advice. Physician remains responsible for every order; the AI only executes and documents. In an emergency in Saudi Arabia call 997.',
+  o2flowU:'L/min'
+},
+ar: {
+  hSub:'العرض السريري المباشر', langBtn:'English', play:'تشغيل', pause:'إيقاف مؤقت', reset:'إعادة', day:'اليوم',
+  pName:'أحمد م. — مشارك تجريبي', pLine:'٦٣ عامًا · انسداد رئوي مزمن (GOLD III) · احتباس CO₂ معروف · خط الأساس SpO₂ ‎92–94%‎ على الهواء · بورغ الأساسي 2', pSim:'بيانات محاكاة',
+  kMon:'المراقبة الحية · قراءة كل دقيقة', chTitle:'SpO₂ ومعدل النبض · آخر ٣ ساعات',
+  lSpo2:'SpO₂ %', lHr:'معدل النبض', lThr:'حد SpO₂ الأدنى 88%', lHr140:'حد النبض 140', lFlag:'قراءة مُعلَّمة', lRx:'علاج مُعطى',
+  vSpo2:'SpO₂', vHr:'معدل النبض', vRr:'معدل التنفس', vSbp:'الضغط الانقباضي', vTemp:'الحرارة', vBorg:'ضيق النفس · بورغ', vNews:'درجة NEWS2',
+  uPct:'%', uBpm:'ن/د', uMin:'/د', uMmhg:'ملم', uC:'°م', uB:'/10', onO2:'على الأكسجين', air:'هواء الغرفة',
+  zoneG:'أخضر · روتيني', zoneA:'أصفر · تواصل مع الفريق', zoneR:'أحمر · إجراء عاجل',
+  n2Urgent:'مراجعة عاجلة', n2Emerg:'استجابة طارئة',
+  kAI:'مراقب «رئتي» الذكي', aiStatus:'يقرأ كل قياس لحظة وصوله، ولا يتصرف إلا ضمن الأوامر الدائمة الموقّعة من الطبيب أدناه، ويسجّل كل ما يفعله.',
+  aiLastL:'آخر تقييم', nextRepL:'التقرير التالي للطبيب', repNow:'أرسل تقريرًا الآن',
+  int15:'تقرير كل ١٥ دقيقة', int30:'تقرير كل ٣٠ دقيقة', int60:'تقرير كل ساعة', int120:'تقرير كل ساعتين',
+  kOrders:'الأوامر الدائمة للطبيب', ordersNote:'لا يتصرف الذكاء الاصطناعي إلا ضمن هذه الأوامر الموقّعة القابلة للتعديل. غيّر أي عتبة وتسري من القراءة التالية.',
+  o2title:'بروتوكول معايرة الأكسجين',
+  o2w1:'ابدأ', o2w2:'لتر/د عندما يهبط SpO₂ دون', o2w3:'% لمدة ٣ دقائق. عدّل ±١ لتر/د كل ١٠ دقائق للبقاء بين', o2w4:'–', o2w5:'%. الحد الأقصى', o2w6:'لتر/د. أضف الترطيب فوق ٤ لتر/د.',
+  ifW:'إذا', forW:'لمدة', minW:'د', arrW:'←',
+  mspo2:'SpO₂', mhr:'النبض', mrr:'التنفس', msbp:'الضغط', mtemp:'الحرارة', mborg:'بورغ', mnews2:'NEWS2',
+  aSalb:'سالبوتامول 2.5 ملغ إرذاذ', aIpra:'إبراتروبيوم 0.5 ملغ إرذاذ', aPred:'بريدنيزون 40 ملغ فمويًا', aO2:'بدء بروتوكول الأكسجين', aNotify:'إشعار الطبيب (عاجل)', aAlarm:'إنذار طارئ', aHold:'إيقاف الموسّع ٦٠ د + إشعار',
+  addRule:'إضافة أمر', del:'حذف', resetOrders:'إعادة الأوامر إلى قيم الأدلة السريرية',
+  kTher:'إجراءات الطبيب المباشرة', therNote:'كل ما يُعطى هنا يُسجَّل تمامًا كأوامر الذكاء الاصطناعي، ويُقيَّم أثره بالطريقة نفسها.',
+  o2lbl:'تدفق الأكسجين', o2stopB:'إيقاف الأكسجين',
+  kScen:'السيناريو · قابل للتعديل', scM:'يوم اعتيادي — نوبات عابرة يعالجها المساعد فيتحسن المريض', scS:'نوبة شديدة — استجابة ضعيفة', scSt:'ليلة مستقرة',
+  slDetL:'شدة النوبات', slRespL:'الاستجابة للعلاج', scenNote:'في اليوم الاعتيادي يبقى المريض مستقرًا معظم الوقت؛ وعند بدء نوبة عابرة يعالجها المساعد ضمن الأوامر الدائمة فيتحسن. تغيير السيناريو يعيد المحاكاة، والمنزلقان يعملان مباشرة — أنزل الاستجابة لترى فشل العلاج وتسلسل التصعيد.',
+  kLog:'التقارير وسجل الأحداث', fAll:'الكل', fRep:'التقارير', fTher:'العلاجات', fAl:'التنبيهات والإنذارات',
+  ackB:'إقرار الاستلام', eAck:'أقرّ الطبيب باستلام الإنذار',
+  eO2Start:f=>`بدء الأكسجين ${f} لتر/د عبر قنية أنفية`, eO2Up:f=>`رفع الأكسجين إلى ${f} لتر/د — SpO₂ دون النطاق المستهدف`, eO2Down:f=>`خفض الأكسجين إلى ${f} لتر/د — SpO₂ فوق 92% (احتياط فرط ثاني أكسيد الكربون)`, eO2StopT:'إيقاف الأكسجين — SpO₂ مستقر في النطاق على أدنى تدفق', eHumid:'التدفق فوق ٤ لتر/د — أُضيف الترطيب وفق AARC',
+  eGive:n=>`إعطاء ${n}`, byAI:'وفق الأمر الدائم', byDoc:'أمر مباشر من الطبيب',
+  eEff:(n,w)=>`تقييم ${n}: فعّال — ${w}`, eIneff:(n,m)=>`${n} غير فعّال بعد ${m} دقيقة — التصعيد مطلوب`,
+  wBorg:'تحسّن ضيق النفس ومعدل التنفس', wSpo2:'عودة SpO₂ إلى النطاق 88–92%',
+  eSabaMax:'ثلاث جلسات إرذاذ خلال ساعة — أوقف الذكاء الاصطناعي الجرعات وطلب مراجعة الطبيب',
+  eHold:v=>`نبض فوق ${v} مستمر — أُوقف الموسّع القصير ٦٠ دقيقة وأُشعر الطبيب`,
+  eNews7:v=>`بلغت درجة NEWS2 ‏${v} — تفعيل الاستجابة الطارئة`, eNews5:v=>`درجة NEWS2 ‏${v} — طُلبت مراجعة سريرية عاجلة`,
+  eO2Max:'بلغ الأكسجين الحد الأقصى وما زال SpO₂ دون الهدف — مراجعة سريرية فورية',
+  eTemp:v=>`حرارة ${v}°م — أُشعر الطبيب (تقييم نوبة إنتانية)`,
+  eRuleFire:(m,o,v)=>`تحقق أمر دائم: ${m} ${o} ${v}`,
+  repTitle:(a,b)=>`تقرير إلى الطبيب · ${a} – ${b}`, repExc:'تقرير استثنائي — العلاج غير فعّال',
+  rNow:'الآن', rRange:'المدى', rTherapies:'علاجات هذه الفترة', rNone:'لا علاجات في هذه الفترة', rAlerts:'تنبيهات', rAlarms:'إنذارات',
+  rAssess:'التقييم', rRec:'التوصية',
+  recG:'استمر في المراقبة الروتينية وفق الخطة الموقّعة.', recA:'تواصل مع المريض خلال الوقت المحدد وراجع استجابة العلاج.', recR:'مراجعة سريرية فورية. عُرضت على المريض تعليمات الطوارئ المعتمدة بما فيها 997.',
+  respEff:'فعّال', respIneff:'غير فعّال', respPend:'بانتظار فحص الاستجابة',
+  ftCites:'العتبات الافتراضية مستمدة من أدلة منشورة: دليل AARC للأكسجين في الرعاية الحادة (2022): SpO₂ ‏88–92% لمرضى الانسداد الرئوي والترطيب فوق ٤ لتر/د · تقرير GOLD 2026: الموسّع القصير خط أول في النوبة والستيرويد الجهازي ≤٥ أيام · درجة NEWS2 من الكلية الملكية للأطباء: 5–6 مراجعة عاجلة و≥7 استجابة طارئة، والمقياس الثاني لمرضى فرط ثاني أكسيد الكربون.',
+  ftDisc:'نموذج بحثي بمريض محاكى بالكامل. ليس جهازًا طبيًا ولا نصيحة سريرية. يبقى الطبيب مسؤولًا عن كل أمر؛ الذكاء الاصطناعي ينفّذ ويوثّق فقط. في الطوارئ داخل المملكة اتصل بـ 997.',
+  o2flowU:'لتر/د'
+}};
+let L = 'en';
+try{ L = localStorage.getItem('riati_lang')==='ar' ? 'ar':'en'; }catch(e){}
+const t = k => T[L][k];
+
+/* ================= state ================= */
+const METRICS = ['spo2','hr','rr','sbp','temp','borg','news2'];
+const TILES = ['spo2','hr','rr','sbp','temp','borg']; // NEWS2 runs in the background; surfaces only when elevated
+const MMETA = {spo2:{u:'uPct',dec:0},hr:{u:'uBpm',dec:0},rr:{u:'uMin',dec:0},sbp:{u:'uMmhg',dec:0},temp:{u:'uC',dec:1},borg:{u:'uB',dec:1},news2:{u:'',dec:0}};
+const ACTIONS = ['salb','ipra','pred','o2','notify','alarm','hold'];
+const DRUGNAME = {salb:'aSalb',ipra:'aIpra',pred:'aPred'};
+
+const defaultProto = () => ({on:true, low:88, high:92, start:2, max:6, every:10, lastT:-999});
+const defaultRules = () => ([
+  {id:'r1',on:true,metric:'spo2',op:'<', val:88, sus:3, action:'o2',    cd:15, builtin:true, cite:'AARC'},
+  {id:'r2',on:true,metric:'borg',op:'>=',val:5,  sus:5, action:'salb',  cd:20, builtin:true, cite:'GOLD'},
+  {id:'r3',on:true,metric:'rr',  op:'>=',val:25, sus:5, action:'salb',  cd:20, builtin:true, cite:'GOLD'},
+  {id:'r4',on:true,metric:'hr',  op:'>=',val:140,sus:5, action:'hold',  cd:30, builtin:true, cite:''},
+  {id:'r5',on:true,metric:'news2',op:'>=',val:7, sus:2, action:'alarm', cd:20, builtin:true, cite:'NEWS2'},
+  {id:'r6',on:true,metric:'news2',op:'>=',val:5, sus:5, action:'notify',cd:30, builtin:true, cite:'NEWS2'},
+  {id:'r7',on:true,metric:'temp',op:'>=',val:38.5,sus:10,action:'notify',cd:120,builtin:true, cite:'GOLD'},
+]);
+
+let S; // sim state
+function freshState(scen){
+  return {
+    scen: scen||'moderate', running:true, speed:60, simSec:0, minute:0,
+    detRate: +document.getElementById('slDet').value/100 || 1,
+    resp: +document.getElementById('slResp').value/100,
+    vit:{spo2:93,hr:90,rr:19,sbp:124,temp:36.8,borg:2.5,news2:0},
+    epi:{next:30+Math.random()*20, active:null},
+    o2:0, hist:[], events:[], evSeq:0,
+    drugs:[], // {rx, at, mag}
+    drugLast:{salb:-999,ipra:-999,pred:-999},
+    salbTimes:[], sabaHoldUntil:-1, sabaMaxFlag:false,
+    checks:[], ineff:{}, sustain:{}, ruleLast:{},
+    lastReport:0, alarm:null, lastBeep:0,
+    o2MaxAlerted:-999, news2Score:{}
+  };
+}
+let proto = defaultProto();
+let rules = defaultRules();
+let repInterval = 60;
+try{
+  const saved = JSON.parse(localStorage.getItem('riati_demo_orders_v2')||'null');
+  if(saved){ proto = {...defaultProto(), ...saved.proto}; rules = saved.rules; repInterval = saved.interval||60; }
+}catch(e){}
+function persistOrders(){ try{ localStorage.setItem('riati_demo_orders_v2', JSON.stringify({proto, rules, interval:repInterval})); }catch(e){} }
+
+/* ================= patient model ================= */
+function baseSeverity(m){
+  const d = S.detRate;
+  if(S.scen==='moderate'){
+    // stable baseline; brief episodes flare up, then resolve (faster once treated)
+    if(!S.epi.active && m>=S.epi.next) S.epi.active={start:m, peak:(2.2+Math.random()*1.2)*d, rise:22, fall:85};
+    let ep=0;
+    const a=S.epi.active;
+    if(a){
+      const age=m-a.start;
+      ep = age<=a.rise ? a.peak*(age/a.rise) : a.peak*Math.exp(-(age-a.rise)/a.fall);
+      if(age>a.rise && ep<0.2){ S.epi.active=null; S.epi.next=m+160+Math.random()*220; }
+    }
+    return 2.1 + 0.25*Math.sin(m/47) + ep;
+  }
+  if(S.scen==='severe')   return 3.6 + 7.2*d*Math.min(1, m/100);
+  return 2 + 0.5*Math.sin(m/38) * d;
+}
+function drugEffect(m){
+  let b=0, salbActive=0;
+  for(const d of S.drugs){
+    const age = m - d.at; if(age<0) continue;
+    let e=0;
+    if(d.rx==='salb'){ e = d.mag * Math.min(1,age/14) * Math.exp(-Math.max(0,age-14)/110); if(e>0.15) salbActive++; }
+    if(d.rx==='ipra'){ e = d.mag * Math.min(1,age/20) * Math.exp(-Math.max(0,age-20)/220); }
+    if(d.rx==='pred'){ e = d.mag * Math.min(1,age/240); }
+    b+=e;
+  }
+  return {b, salbActive};
+}
+function news2(v,onO2){
+  const s={};
+  s.rr = v.rr<=8?3 : v.rr<=11?1 : v.rr<=20?0 : v.rr<=24?2 : 3;
+  // Scale 2 (hypercapnic, prescribed 88–92)
+  const sp=v.spo2;
+  if(sp<=83) s.spo2=3; else if(sp<=85) s.spo2=2; else if(sp<=87) s.spo2=1; else if(sp<=92) s.spo2=0;
+  else s.spo2 = onO2 ? (sp<=94?1: sp<=96?2:3) : 0;
+  s.o2 = onO2?2:0;
+  s.sbp = v.sbp<=90?3 : v.sbp<=100?2 : v.sbp<=110?1 : v.sbp<=219?0 : 3;
+  s.hr = v.hr<=40?3 : v.hr<=50?1 : v.hr<=90?0 : v.hr<=110?1 : v.hr<=130?2 : 3;
+  s.temp = v.temp<=35?3 : v.temp<=36?1 : v.temp<=38?0 : v.temp<=39?1 : 2;
+  const total = s.rr+s.spo2+s.o2+s.sbp+s.hr+s.temp;
+  const single3 = Math.max(s.rr,s.spo2,s.sbp,s.hr,s.temp)>=3;
+  return {total, single3, s};
+}
+const rnd = (()=>{ let seed=7; return ()=>{ seed=(seed*9301+49297)%233280; return seed/233280-0.5; };})();
+function stepMinute(m){
+  S.resp = +el.slResp.value/100; S.detRate = +el.slDet.value/100;
+  const {b, salbActive} = drugEffect(m);
+  const Seff = Math.max(0, Math.min(12, baseSeverity(m) - b));
+  const o2boost = S.o2>0 ? 5.4*(1-Math.exp(-S.o2/2.6)) : 0;
+  const v = S.vit;
+  const tgt = {
+    spo2: Math.max(70, Math.min(99.5, 97.2 - 1.45*Seff + o2boost)),
+    hr:   78 + 4.6*Seff + 8*salbActive + (v.spo2<86?12:0),
+    rr:   13.5 + 2.1*Seff,
+    sbp:  121 + 1.8*Seff,
+    temp: 36.7 + (S.scen==='severe'?0.16:0.06)*Seff,
+    borg: Math.max(0, Math.min(10, 0.9 + 0.85*Seff))
+  };
+  v.spo2 = Math.round((v.spo2 + (tgt.spo2-v.spo2)*.28 + rnd()*.7)*10)/10;
+  v.hr   = Math.round(v.hr   + (tgt.hr-v.hr)*.3  + rnd()*3.4);
+  v.rr   = Math.round(v.rr   + (tgt.rr-v.rr)*.3  + rnd()*1.4);
+  v.sbp  = Math.round(v.sbp  + (tgt.sbp-v.sbp)*.25+ rnd()*4);
+  v.temp = Math.round((v.temp+ (tgt.temp-v.temp)*.2 + rnd()*.08)*10)/10;
+  v.borg = Math.round((v.borg+ (tgt.borg-v.borg)*.3+ rnd()*.3)*2)/2;
+  const nw = news2(v, S.o2>0);
+  v.news2 = nw.total; S.news2Score = nw;
+  S.hist.push({m, spo2:v.spo2, hr:v.hr, rr:v.rr, sbp:v.sbp, temp:v.temp, borg:v.borg, news2:v.news2, o2:S.o2});
+  if(S.hist.length>1500) S.hist.shift();
+  aiTick(m, v, nw);
+}
+
+/* ================= AI engine ================= */
+function log(type, mkTitle, mkBody, extra){
+  const e = {id:++S.evSeq, m:S.minute, type, mkTitle, mkBody:mkBody||null, ...extra};
+  S.events.push(e); if(S.events.length>300) S.events.shift();
+  renderNewEntry(e);
+  if(type!=='report') setAiLast(e);
+  return e;
+}
+function setAiLast(e){ el.aiLast.textContent = fmtT(e.m)+' — '+e.mkTitle(); }
+function alarmOn(mkTitle){
+  S.alarm = {mkTitle, at:S.minute};
+  el.alarmTxt.textContent = mkTitle();
+  el.alarmbar.classList.add('show');
+  beep(2);
+}
+function opTest(op,a,b){ return op==='<'?a<b : op==='<='?a<=b : op==='>'?a>b : a>=b; }
+function giveDrug(rx, by, m){
+  if((rx==='salb') ){
+    if(S.sabaHoldUntil>m){ return false; }
+    if(m - S.drugLast.salb < 20) return false;
+    S.salbTimes = S.salbTimes.filter(x=>m-x<60);
+    if(S.salbTimes.length>=3){
+      if(!S.sabaMaxFlag){ S.sabaMaxFlag=true; log('alert', ()=>t('eSabaMax')); }
+      return false;
+    }
+    S.salbTimes.push(m); S.sabaMaxFlag=false;
+  }
+  if(rx==='ipra' && m-S.drugLast.ipra<240) return false;
+  if(rx==='pred' && m-S.drugLast.pred<1440) return false;
+  S.drugLast[rx]=m;
+  const mag = rx==='salb'?2.3*S.resp : rx==='ipra'?1.3*S.resp : 1.6*S.resp;
+  S.drugs.push({rx, at:m, mag});
+  if(S.epi.active && (rx==='salb'||rx==='ipra')) S.epi.active.fall = Math.max(16, 70*(1-S.resp));
+  const nameK = DRUGNAME[rx];
+  log('therapy', ()=>t('eGive')(t(nameK)), ()=>t(by));
+  if(rx!=='pred') S.checks.push({due:m+25, rx, base:{...S.vit}});
+  return true;
+}
+function o2Set(f, mk){
+  const was=S.o2; S.o2=Math.max(0,Math.min(proto.max,f));
+  if(S.o2!==was){ log('therapy', mk); if(was<=4&&S.o2>4) log('ai',()=>t('eHumid')); }
+}
+function runAction(rule, m){
+  const a=rule.action;
+  if(a==='o2'){ if(proto.on && S.o2===0){ o2Set(proto.start, ()=>t('eO2Start')(proto.start)); S.checks.push({due:m+20, rx:'o2', base:{...S.vit}}); } }
+  else if(a==='salb'||a==='ipra'||a==='pred'){ giveDrug(a,'byAI',m); }
+  else if(a==='notify'){ log('alert', rule.metric==='news2' ? ()=>t('eNews5')(S.vit.news2) : rule.metric==='temp' ? ()=>t('eTemp')(S.vit.temp) : ()=>t('eRuleFire')(t('m'+rule.metric), rule.op, rule.val)); }
+  else if(a==='alarm'){ const mk=()=>t('eNews7')(S.vit.news2); log('alarm', mk); alarmOn(mk); sendReport(m,true); }
+  else if(a==='hold'){ S.sabaHoldUntil=m+60; const mk=()=>t('eHold')(rule.val); log('alarm', mk); alarmOn(mk); }
+}
+function aiTick(m, v, nw){
+  // standing orders
+  for(const r of rules){
+    if(!r.on) continue;
+    const val = v[r.metric]; if(val==null) continue;
+    S.sustain[r.id] = opTest(r.op, val, r.val) ? (S.sustain[r.id]||0)+1 : 0;
+    if(S.sustain[r.id]>=r.sus && m-(S.ruleLast[r.id]??-999)>=r.cd){
+      S.ruleLast[r.id]=m; runAction(r,m);
+    }
+  }
+  // O2 titration
+  if(proto.on && S.o2>0 && m-proto.lastT>=proto.every){
+    const recent = S.hist.slice(-5), mean = recent.reduce((a,h)=>a+h.spo2,0)/recent.length;
+    if(mean < proto.low){
+      if(S.o2 < proto.max){ proto.lastT=m; o2Set(S.o2+1, ()=>t('eO2Up')(S.o2+1)); }
+      else if(m-S.o2MaxAlerted>30){ S.o2MaxAlerted=m; const mk=()=>t('eO2Max'); log('alarm',mk); alarmOn(mk); sendReport(m,true); }
+    } else if(mean > proto.high){
+      proto.lastT=m;
+      if(S.o2>1) o2Set(S.o2-1, ()=>t('eO2Down')(S.o2-1));
+      else { S.o2=0; log('therapy', ()=>t('eO2StopT')); }
+    }
+  }
+  // effectiveness checks
+  for(const c of S.checks.filter(c=>c.due===m)){
+    let eff=false, whyK='';
+    if(c.rx==='o2'){ eff = v.spo2>=proto.low; whyK='wSpo2'; }
+    else { eff = (v.borg<=c.base.borg-0.8)||(v.rr<=c.base.rr-3); whyK='wBorg'; }
+    const nameK = c.rx==='o2' ? null : DRUGNAME[c.rx];
+    const nm = ()=> c.rx==='o2' ? 'O₂' : t(nameK);
+    if(eff){ S.ineff[c.rx]=0; log('ai', ()=>t('eEff')(nm(), t(whyK))); }
+    else{
+      S.ineff[c.rx]=(S.ineff[c.rx]||0)+1;
+      const mk = ()=>t('eIneff')(nm(), 25);
+      log(S.ineff[c.rx]>=2?'alarm':'alert', mk);
+      if(S.ineff[c.rx]>=2) alarmOn(mk);
+      sendReport(m,true);
+    }
+  }
+  S.checks = S.checks.filter(c=>c.due>m);
+  // scheduled report
+  if(m - S.lastReport >= repInterval) sendReport(m,false);
+}
+
+/* ================= reports ================= */
+function stat(win,k){
+  const vals = win.map(h=>h[k]);
+  const cur = vals[vals.length-1], mn=Math.min(...vals), mx=Math.max(...vals);
+  const third = Math.max(1,Math.floor(vals.length/3));
+  const a = vals.slice(0,third).reduce((x,y)=>x+y,0)/third;
+  const b = vals.slice(-third).reduce((x,y)=>x+y,0)/third;
+  const eps = {spo2:.6,hr:4,rr:1.5,sbp:4,temp:.2,borg:.5,news2:.7}[k]||1;
+  return {cur, mn, mx, trend: b-a>eps?'↑': a-b>eps?'↓':'→'};
+}
+function zoneOf(nw){ return nw.total>=7?'R': (nw.total>=5||nw.single3)?'A':'G'; }
+function sendReport(m, exception){
+  const from=S.lastReport; S.lastReport=m;
+  const win=S.hist.filter(h=>h.m>from&&h.m<=m); if(!win.length) return;
+  const data={from,to:m,exception:!!exception,stats:{},o2:S.o2,news2:{...S.news2Score}};
+  for(const k of METRICS) data.stats[k]=stat(win,k);
+  data.zone = zoneOf(S.news2Score);
+  data.therapies = S.events.filter(e=>e.type==='therapy'&&e.m>from&&e.m<=m).map(e=>({m:e.m, title:e.mkTitle}));
+  data.alerts = S.events.filter(e=>e.type==='alert'&&e.m>from&&e.m<=m).length;
+  data.alarms = S.events.filter(e=>e.type==='alarm'&&e.m>from&&e.m<=m).length;
+  log('report', ()=>t('repTitle')(fmtT(from),fmtT(m)), null, {data});
+}
+
+/* ================= rendering ================= */
+const el={};
+['alarmbar','alarmTxt','ackBtn','clock','playBtn','resetBtn','langBtn','speedSeg','hSub','pName','pLine','pSim','pInitial','zoneChip','news2Chip','kMon','tiles','chTitle','chLegend','chart','kLog','filters','log','kAI','aiStatus','aiLastL','aiLast','nextRepL','nextRep','repInt','repNowBtn','kOrders','ordersNote','o2on','o2title','o2words','rules','addRow','resetOrdersBtn','kTher','therNote','therBtns','o2lbl','o2minus','o2plus','o2now','o2stop','kScen','scenBtns','slDet','slDetV','slDetL','slResp','slRespV','slRespL','scenNote','ftCites','ftDisc'].forEach(id=>el[id]=document.getElementById(id));
+
+function fmtT(m){ const total=8*60+m; const d=Math.floor(total/1440)+1, hh=String(Math.floor(total/60)%24).padStart(2,'0'), mm=String(total%60).padStart(2,'0'); return t('day')+' '+d+' · '+hh+':'+mm; }
+const ZC={G:['var(--green)','zoneG'],A:['var(--amber)','zoneA'],R:['var(--red)','zoneR']};
+
+function renderStatic(){
+  document.documentElement.lang=L; document.documentElement.dir = L==='ar'?'rtl':'ltr';
+  document.title = L==='ar'?'رئتي — العرض السريري المباشر':'Riati — Live Clinical Demo';
+  el.hSub.textContent=t('hSub'); el.langBtn.textContent=t('langBtn');
+  el.playBtn.textContent=S.running?t('pause'):t('play'); el.resetBtn.textContent=t('reset');
+  el.pName.textContent=t('pName'); el.pLine.textContent=t('pLine'); el.pSim.textContent=t('pSim');
+  el.kMon.textContent=t('kMon'); el.chTitle.textContent=t('chTitle');
+  el.chLegend.innerHTML=[
+    '<span style="display:inline-flex;align-items:center;gap:5px"><span style="width:14px;height:2px;background:var(--aub)"></span>'+t('lSpo2')+'</span>',
+    '<span style="display:inline-flex;align-items:center;gap:5px"><span style="width:14px;height:2px;background:#9B7FA6"></span>'+t('lHr')+'</span>',
+    '<span style="display:inline-flex;align-items:center;gap:5px"><span style="width:14px;border-top:2px dashed var(--red)"></span>'+t('lThr')+'</span>',
+    '<span style="display:inline-flex;align-items:center;gap:5px"><span style="width:9px;height:9px;border-radius:50%;background:var(--amber)"></span>'+t('lFlag')+'</span>',
+    '<span style="display:inline-flex;align-items:center;gap:5px"><span style="width:9px;height:9px;background:var(--gold);transform:rotate(45deg)"></span>'+t('lRx')+'</span>'
+  ].join('');
+  el.kLog.textContent=t('kLog'); el.ackBtn.textContent=t('ackB');
+  el.kAI.textContent=t('kAI'); el.aiStatus.textContent=t('aiStatus'); el.aiLastL.textContent=t('aiLastL');
+  el.nextRepL.textContent=t('nextRepL'); el.repNowBtn.textContent=t('repNow');
+  el.repInt.innerHTML=[15,30,60,120].map(x=>'<option value="'+x+'"'+(x===repInterval?' selected':'')+'>'+t('int'+x)+'</option>').join('');
+  el.kOrders.textContent=t('kOrders'); el.ordersNote.textContent=t('ordersNote'); el.o2title.textContent=t('o2title');
+  el.resetOrdersBtn.textContent=t('resetOrders');
+  el.kTher.textContent=t('kTher'); el.therNote.textContent=t('therNote'); el.o2lbl.textContent=t('o2lbl'); el.o2stop.textContent=t('o2stopB');
+  el.kScen.textContent=t('kScen'); el.scenNote.textContent=t('scenNote');
+  el.slDetL.textContent=t('slDetL'); el.slRespL.textContent=t('slRespL');
+  el.ftCites.textContent=t('ftCites'); el.ftDisc.textContent=t('ftDisc');
+  // speed segment
+  el.speedSeg.innerHTML=[[1,'×1'],[60,'×60'],[300,'×300']].map(([v,l])=>'<button data-v="'+v+'" class="'+(S.speed===v?'on':'')+'" dir="ltr">'+l+'</button>').join('');
+  el.speedSeg.querySelectorAll('button').forEach(b=>b.onclick=()=>{S.speed=+b.dataset.v;renderStatic();});
+  // therapy buttons
+  el.therBtns.innerHTML='';
+  [['salb','aSalb'],['ipra','aIpra'],['pred','aPred']].forEach(([rx,k])=>{
+    const b=document.createElement('button'); b.className='btn'; b.textContent=t(k);
+    b.onclick=()=>{ giveDrug(rx,'byDoc',S.minute); renderAll(); };
+    el.therBtns.appendChild(b);
+  });
+  // scenario buttons
+  el.scenBtns.innerHTML='';
+  [['moderate','scM',85],['severe','scS',25],['stable','scSt',85]].forEach(([sc,k,resp])=>{
+    const b=document.createElement('button'); b.className='chip'+(S.scen===sc?' on':''); b.style.textAlign='start'; b.textContent=t(k);
+    b.onclick=()=>{ el.slResp.value=resp; reset(sc); };
+    el.scenBtns.appendChild(b);
+  });
+  // filters
+  const F=[['all','fAll'],['report','fRep'],['therapy','fTher'],['al','fAl']];
+  el.filters.innerHTML='';
+  F.forEach(([f,k])=>{ const b=document.createElement('button'); b.className='chip'+(logFilter===f?' on':''); b.textContent=t(k);
+    b.onclick=()=>{logFilter=f;renderStatic();renderLog();}; el.filters.appendChild(b); });
+  renderOrders(); renderSliders(); renderLog(); renderAll();
+}
+function renderSliders(){
+  el.slDetV.textContent='×'+(+el.slDet.value/100).toFixed(2);
+  el.slRespV.textContent=Math.round(+el.slResp.value)+'%';
+}
+function renderOrders(){
+  el.o2on.checked=proto.on;
+  const w=(k)=>'<span>'+t(k)+'</span>';
+  const inp=(key,val,cls)=>'<input type="number" class="num small" data-p="'+key+'" value="'+val+'">';
+  el.o2words.innerHTML=w('o2w1')+inp('start',proto.start)+w('o2w2')+inp('low',proto.low)+w('o2w3')+inp('low2',proto.low)+w('o2w4')+inp('high',proto.high)+w('o2w5')+inp('max',proto.max)+w('o2w6');
+  el.o2words.querySelectorAll('input').forEach(i=>i.onchange=()=>{ const k=i.dataset.p==='low2'?'low':i.dataset.p; proto[k]=+i.value; persistOrders(); renderOrders(); });
+  el.rules.innerHTML='';
+  for(const r of rules){
+    const row=document.createElement('div'); row.className='rule'+(r.on?'':' off');
+    row.innerHTML='<input type="checkbox" class="switch" '+(r.on?'checked':'')+'>'
+      +'<span class="word">'+t('ifW')+'</span><span class="metr">'+t('m'+r.metric)+'</span>'
+      +'<span dir="ltr" style="color:var(--mut)">'+r.op+'</span>'
+      +'<input type="number" class="num small" data-k="val" value="'+r.val+'" step="'+(r.metric==='temp'?0.1:1)+'">'
+      +'<span class="word">'+t('forW')+'</span><input type="number" class="num small" data-k="sus" value="'+r.sus+'"><span class="word">'+t('minW')+'</span>'
+      +'<span class="word">'+t('arrW')+'</span><span class="act">'+t('a'+({salb:'Salb',ipra:'Ipra',pred:'Pred',o2:'O2',notify:'Notify',alarm:'Alarm',hold:'Hold'})[r.action])+'</span>'
+      +(r.cite?'<span class="cite">'+r.cite+'</span>':'')
+      +(!r.builtin?'<button class="btn" style="font-size:11px;padding:3px 10px">'+t('del')+'</button>':'');
+    row.querySelector('.switch').onchange=e=>{r.on=e.target.checked;persistOrders();renderOrders();};
+    row.querySelectorAll('input.num').forEach(i=>i.onchange=()=>{r[i.dataset.k]=+i.value;persistOrders();});
+    const db=row.querySelector('button.btn'); if(db) db.onclick=()=>{rules=rules.filter(x=>x!==r);persistOrders();renderOrders();};
+    el.rules.appendChild(row);
+  }
+  // add row
+  const mOpts=METRICS.map(m=>'<option value="'+m+'">'+t('m'+m)+'</option>').join('');
+  const aOpts=ACTIONS.map(a=>'<option value="'+a+'">'+t('a'+({salb:'Salb',ipra:'Ipra',pred:'Pred',o2:'O2',notify:'Notify',alarm:'Alarm',hold:'Hold'})[a])+'</option>').join('');
+  el.addRow.innerHTML='<span class="word" style="font-size:12px;color:var(--mut)">'+t('ifW')+'</span>'
+    +'<select class="sel" id="nrM">'+mOpts+'</select>'
+    +'<select class="sel" id="nrO" dir="ltr"><option><</option><option><=</option><option>></option><option selected>>=</option></select>'
+    +'<input type="number" class="num small" id="nrV" value="30">'
+    +'<span style="font-size:12px;color:var(--mut)">'+t('forW')+'</span><input type="number" class="num small" id="nrS" value="5"><span style="font-size:12px;color:var(--mut)">'+t('minW')+'</span>'
+    +'<select class="sel" id="nrA">'+aOpts+'</select>'
+    +'<button class="btn btn-primary" id="nrAdd" style="font-size:12px">'+t('addRule')+'</button>';
+  document.getElementById('nrAdd').onclick=()=>{
+    rules.push({id:'c'+Date.now(),on:true,metric:document.getElementById('nrM').value,op:document.getElementById('nrO').value,val:+document.getElementById('nrV').value,sus:+document.getElementById('nrS').value,action:document.getElementById('nrA').value,cd:20,builtin:false,cite:''});
+    persistOrders(); renderOrders();
+  };
+}
+function tileState(k,v){
+  if(k==='spo2') return v<proto.low?'crit': v<proto.low+2&&S.o2===0?'warn':'';
+  if(k==='hr') return v>=140?'crit': v>=120?'warn':'';
+  if(k==='rr') return v>=30?'crit': v>=25?'warn':'';
+  if(k==='news2') return v>=7?'crit': v>=5?'warn':'';
+  if(k==='borg') return v>=7?'crit': v>=5?'warn':'';
+  if(k==='temp') return v>=38.5?'warn':'';
+  return '';
+}
+function spark(k){
+  const h=S.hist.slice(-45); if(h.length<2) return '';
+  const vals=h.map(x=>x[k]); const mn=Math.min(...vals), mx=Math.max(...vals), sp=(mx-mn)||1;
+  const pts=vals.map((v,i)=>((i*90)/(vals.length-1)).toFixed(1)+','+(24-((v-mn)/sp)*22+1).toFixed(1)).join(' ');
+  return '<svg viewBox="0 0 90 26" style="position:absolute;bottom:6px;inset-inline-end:12px;width:90px;height:26px;opacity:.55" dir="ltr"><polyline points="'+pts+'" fill="none" stroke="#4F2D57" stroke-width="1.5"/></svg>';
+}
+function renderTiles(){
+  const v=S.vit;
+  el.tiles.innerHTML=TILES.map(k=>{
+    const meta=MMETA[k], val=(+v[k]).toFixed(meta.dec);
+    const sub = k==='spo2' ? (S.o2>0? t('onO2')+' '+S.o2+' '+t('o2flowU') : t('air')) : '';
+    return '<div class="tile '+tileState(k,v[k])+'"><div class="lbl">'+t('v'+({spo2:'Spo2',hr:'Hr',rr:'Rr',sbp:'Sbp',temp:'Temp',borg:'Borg',news2:'News'})[k])+'</div>'
+      +'<div class="val" dir="ltr">'+val+'<small> '+(meta.u?t(meta.u):'')+'</small></div>'
+      +'<div class="sub">'+sub+'</div>'+spark(k)+'</div>';
+  }).join('');
+}
+function renderChart(){
+  const Wm=180, h=S.hist.filter(x=>x.m>S.minute-Wm);
+  if(h.length<2){ el.chart.innerHTML='<div style="padding:40px;text-align:center;color:var(--mut)">…</div>'; return; }
+  const W=920,H=280,p=38;
+  const x=m=>p+((m-h[0].m)*(W-2*p))/Math.max(1,(h[h.length-1].m-h[0].m));
+  const ySp=v=>H-p-((v-78)/(100-78))*(H-2*p);
+  const yHr=v=>H-p-((v-50)/(170-50))*(H-2*p);
+  let out='<svg viewBox="0 0 '+W+' '+H+'" dir="ltr" style="width:100%;height:auto;display:block">';
+  for(let i=0;i<=4;i++){ const vv=78+(22*i)/4, y=ySp(vv);
+    out+='<line x1="'+p+'" x2="'+(W-p)+'" y1="'+y+'" y2="'+y+'" stroke="#EDE6F2"/><text x="'+(p-6)+'" y="'+(y+4)+'" font-size="10" fill="#6B5C70" text-anchor="end">'+Math.round(vv)+'%</text>'
+      +'<text x="'+(W-p+6)+'" y="'+(y+4)+'" font-size="10" fill="#B9A8C0" text-anchor="start">'+Math.round(50+(120*i)/4)+'</text>'; }
+  out+='<line x1="'+p+'" x2="'+(W-p)+'" y1="'+ySp(proto.low)+'" y2="'+ySp(proto.low)+'" stroke="#A8323E" stroke-dasharray="6 6" stroke-width="1.5"/>';
+  out+='<line x1="'+p+'" x2="'+(W-p)+'" y1="'+yHr(140)+'" y2="'+yHr(140)+'" stroke="#A8323E" stroke-dasharray="2 5" stroke-width="1"/>';
+  const path=(k,ys)=>h.map((d,i)=>(i?'L':'M')+x(d.m).toFixed(1)+','+ys(d[k]).toFixed(1)).join(' ');
+  out+='<path d="'+path('hr',yHr)+'" fill="none" stroke="#9B7FA6" stroke-width="1.6" stroke-linejoin="round"/>';
+  out+='<path d="'+path('spo2',ySp)+'" fill="none" stroke="#4F2D57" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>';
+  h.forEach(d=>{ if(d.spo2<proto.low) out+='<circle cx="'+x(d.m).toFixed(1)+'" cy="'+ySp(d.spo2).toFixed(1)+'" r="3.6" fill="#C9822B" stroke="#fff" stroke-width="1.4"/>'; });
+  for(const e of S.events){ if(e.type==='therapy'&&e.m>=h[0].m&&e.m<=h[h.length-1].m)
+    out+='<g transform="translate('+x(e.m).toFixed(1)+','+(p-14)+')"><rect x="-4.5" y="-4.5" width="9" height="9" transform="rotate(45)" fill="#B8892E"/><line x1="0" x2="0" y1="8" y2="'+(H-p-(p-14))+'" stroke="#B8892E" stroke-opacity=".25" stroke-dasharray="3 4"/></g>'; }
+  const step=Math.max(1,Math.ceil(h.length/6));
+  h.forEach((d,i)=>{ if(i%step===0||i===h.length-1){ const tm=fmtT(d.m).split('· ')[1];
+    out+='<text x="'+x(d.m).toFixed(1)+'" y="'+(H-p+16)+'" font-size="10" fill="#6B5C70" text-anchor="middle">'+tm+'</text>'; }});
+  out+='</svg>';
+  el.chart.innerHTML=out;
+}
+let logFilter='all', renderedIds=new Set();
+function entryNode(e){
+  const div=document.createElement('div');
+  div.className='log-entry e-'+e.type; div.dataset.type=e.type; div.dataset.id=e.id;
+  let inner='<div class="lt" dir="ltr">'+fmtT(e.m)+'</div><div class="ttl">'+((e.data&&e.data.exception)?'<span style="color:var(--red)">'+t('repExc')+'</span><br>':'')+e.mkTitle()+'</div>';
+  if(e.data){ inner+=reportBody(e.data); }
+  else if(e.mkBody){ inner+='<div class="bd">'+ (typeof e.mkBody==='function'? (T[L][e.mkBody]||e.mkBody()) : e.mkBody) +'</div>'; }
+  div.innerHTML=inner;
+  return div;
+}
+function reportBody(d){
+  const cells=['spo2','hr','rr','borg','temp','news2'].map(k=>{
+    const s=d.stats[k], meta=MMETA[k];
+    return '<div class="rep-cell"><div class="k">'+t('v'+({spo2:'Spo2',hr:'Hr',rr:'Rr',sbp:'Sbp',temp:'Temp',borg:'Borg',news2:'News'})[k])+'</div>'
+      +'<div class="v" dir="ltr">'+(+s.cur).toFixed(meta.dec)+' <span style="font-size:13px;color:var(--mut)">'+s.trend+'</span></div>'
+      +'<div class="r" dir="ltr">'+t('rRange')+' '+(+s.mn).toFixed(meta.dec)+'–'+(+s.mx).toFixed(meta.dec)+'</div></div>';
+  }).join('');
+  const [zc,zk]=ZC[d.zone];
+  const ther = d.therapies.length
+    ? d.therapies.map(x=>'<div style="display:flex;gap:8px;font-size:13px;color:var(--body)"><span dir="ltr" style="color:var(--mut);flex:none">'+fmtT(x.m)+'</span><span>'+x.title()+'</span></div>').join('')
+    : '<div class="bd" style="color:var(--mut)">'+t('rNone')+'</div>';
+  return '<div class="rep-grid">'+cells+'</div>'
+    +'<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:4px 0 8px"><span class="zonechip" style="background:'+zc+'">'+t(zk)+'</span>'
+    +'<span class="tiny" dir="ltr">O₂ '+d.o2+' '+t('o2flowU')+' · '+d.alerts+' '+t('rAlerts')+' · '+d.alarms+' '+t('rAlarms')+'</span></div>'
+    +'<div style="font-size:12px;font-weight:600;color:var(--aub-d);margin-bottom:3px">'+t('rTherapies')+'</div>'+ther
+    +'<div style="border-top:1px dashed var(--line);margin-top:8px;padding-top:8px" class="bd"><b>'+t('rRec')+':</b> '+t(d.zone==='R'?'recR':d.zone==='A'?'recA':'recG')+'</div>';
+}
+function renderNewEntry(e){
+  if(logFilter!=='all' && !(logFilter==='al'?(e.type==='alert'||e.type==='alarm'):e.type===logFilter)) { return; }
+  el.log.prepend(entryNode(e)); renderedIds.add(e.id);
+  while(el.log.children.length>150) el.log.lastChild.remove();
+}
+function renderLog(){
+  el.log.innerHTML=''; renderedIds=new Set();
+  const list=S.events.filter(e=> logFilter==='all' || (logFilter==='al'?(e.type==='alert'||e.type==='alarm'):e.type===logFilter));
+  for(const e of list.slice(-150)) { el.log.prepend(entryNode(e)); renderedIds.add(e.id); }
+}
+function renderAll(){
+  el.clock.textContent=fmtT(S.minute);
+  const nw = S.news2Score.total!=null?S.news2Score:{total:0,single3:false};
+  const [zc,zk]=ZC[zoneOf(nw)];
+  el.zoneChip.style.background=zc; el.zoneChip.textContent=t(zk);
+  if(nw.total>=7){ el.news2Chip.hidden=false; el.news2Chip.style.background='var(--red)'; el.news2Chip.textContent='NEWS2 '+nw.total+' · '+t('n2Emerg'); }
+  else if(nw.total>=5||nw.single3){ el.news2Chip.hidden=false; el.news2Chip.style.background='var(--amber)'; el.news2Chip.textContent='NEWS2 '+nw.total+' · '+t('n2Urgent'); }
+  else el.news2Chip.hidden=true;
+  renderTiles(); renderChart();
+  const rem=repInterval-(S.minute-S.lastReport);
+  el.nextRep.textContent = rem>0 ? rem+' '+t('minW') : '…';
+  el.o2now.textContent=S.o2+' '+t('o2flowU');
+}
+
+/* ================= audio ================= */
+let AC=null;
+function unlockAudio(){ if(!AC){ try{ AC=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} } }
+document.addEventListener('click', unlockAudio, {once:true});
+function beep(n){ if(!AC) return; for(let i=0;i<n;i++){ const o=AC.createOscillator(),g=AC.createGain(); o.connect(g); g.connect(AC.destination); o.frequency.value=880; g.gain.setValueAtTime(.0001,AC.currentTime+i*.35); g.gain.exponentialRampToValueAtTime(.18,AC.currentTime+i*.35+.02); g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+i*.35+.28); o.start(AC.currentTime+i*.35); o.stop(AC.currentTime+i*.35+.3);} }
+
+/* ================= controls ================= */
+el.playBtn.onclick=()=>{ S.running=!S.running; el.playBtn.textContent=S.running?t('pause'):t('play'); };
+el.resetBtn.onclick=()=>reset(S.scen);
+el.langBtn.onclick=()=>{ L=L==='en'?'ar':'en'; try{localStorage.setItem('riati_lang',L);}catch(e){} renderStatic(); };
+el.ackBtn.onclick=()=>{ if(S.alarm){ S.alarm=null; el.alarmbar.classList.remove('show'); log('ai',()=>t('eAck')); } };
+el.repNowBtn.onclick=()=>{ sendReport(S.minute,false); renderAll(); };
+el.repInt.onchange=()=>{ repInterval=+el.repInt.value; persistOrders(); renderAll(); };
+el.o2on.onchange=()=>{ proto.on=el.o2on.checked; persistOrders(); };
+el.o2plus.onclick=()=>{ o2Set(S.o2+1, ()=> S.o2===0? t('eO2Start')(1):t('eO2Up')(Math.min(proto.max,S.o2+1))); renderAll(); };
+el.o2minus.onclick=()=>{ if(S.o2>0){ const nf=S.o2-1; if(nf===0){ S.o2=0; log('therapy',()=>t('eO2StopT')); } else o2Set(nf,()=>t('eO2Down')(nf)); renderAll(); } };
+el.o2stop.onclick=()=>{ if(S.o2>0){ S.o2=0; log('therapy',()=>t('eO2StopT')); renderAll(); } };
+el.slDet.oninput=renderSliders; el.slResp.oninput=renderSliders;
+el.resetOrdersBtn.onclick=()=>{ proto=defaultProto(); rules=defaultRules(); repInterval=60; persistOrders(); renderStatic(); };
+
+function reset(scen){
+  const speed=S?S.speed:60;
+  S=freshState(scen); S.speed=speed;
+  renderStatic();
+}
+
+/* ================= main loop ================= */
+S=freshState('moderate');
+renderStatic();
+setInterval(()=>{
+  if(!S.running) return;
+  S.simSec+=S.speed*0.5;
+  const target=Math.floor(S.simSec/60);
+  let n=0;
+  while(S.minute<target&&n<12){ S.minute++; n++; stepMinute(S.minute); }
+  if(n) renderAll();
+  if(S.alarm && AC && Date.now()-S.lastBeep>8000){ S.lastBeep=Date.now(); beep(2); }
+},500);
+</script>
+</body>
+</html>

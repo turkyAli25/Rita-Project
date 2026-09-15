@@ -1,0 +1,6 @@
+# macOS
+.DS_Store
+.thumbnail
+
+# Source documents — investor brief and project drafts (kept out of the repo)
+uploads/
