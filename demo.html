@@ -66,6 +66,7 @@ select.sel{border:1px solid #D9CCE3;border-radius:8px;padding:5px 8px;font-size:
 .rule .act{color:var(--aub);font-weight:600}
 .rule .cite{font-size:10px;letter-spacing:.06em;color:var(--gold);border:1px solid var(--gold);border-radius:999px;padding:1px 7px}
 .rule.off{opacity:.42}
+.rgroup{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);font-weight:600;margin:12px 0 2px}
 .switch{appearance:none;width:34px;height:20px;border-radius:999px;background:#D9CCE3;position:relative;cursor:pointer;flex:none;margin:0}
 .switch:checked{background:var(--green)}
 .switch::after{content:'';position:absolute;top:2px;inset-inline-start:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform .2s}
@@ -103,6 +104,7 @@ h3.cardt{margin:0 0 4px;font-family:'Newsreader','Amiri',serif;font-weight:400;f
     <div class="seg" id="speedSeg"></div>
     <button class="btn btn-primary" id="playBtn"></button>
     <button class="btn" id="resetBtn"></button>
+    <button class="btn" id="liveBtn"></button>
     <button class="btn" id="langBtn"></button>
   </div>
 </div></header>
@@ -156,6 +158,7 @@ h3.cardt{margin:0 0 4px;font-family:'Newsreader','Amiri',serif;font-weight:400;f
       <div class="serif" style="font-size:22px" id="kAI"></div>
     </div>
     <div style="font-size:13px;color:#C9B8D1;line-height:1.55" id="aiStatus"></div>
+    <div id="liveStatus" style="font-size:12px;line-height:1.5;color:#D4B26A;margin-top:8px;word-break:break-all" hidden></div>
     <div style="background:rgba(255,255,255,.06);border:1px solid rgba(217,204,227,.2);border-radius:14px;padding:12px 14px;margin-top:12px">
       <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#D4B26A;font-weight:600" id="aiLastL"></div>
       <div style="font-size:13.5px;line-height:1.55;margin-top:5px" id="aiLast">—</div>
@@ -226,13 +229,22 @@ h3.cardt{margin:0 0 4px;font-family:'Newsreader','Amiri',serif;font-weight:400;f
 const T = {
 en: {
   hSub:'Live clinical demo', langBtn:'العربية', play:'Run', pause:'Pause', reset:'Reset', day:'Day',
-  pName:'Ahmad M. — demo participant', pLine:'63 years · COPD (GOLD III) · known CO₂ retainer · baseline SpO₂ 92–94% on room air · baseline Borg 2', pSim:'Simulated data',
+  pName:'Ahmad M. — demo participant', pLine:'63 years · COPD (GOLD III) · HFpEF and hypertension on bisoprolol and amlodipine · known CO₂ retainer · baseline SpO₂ 92–94% on room air · dry weight 78 kg', pSim:'Simulated data',
   kMon:'Live monitor · one reading per minute', chTitle:'SpO₂ and heart rate · last 3 hours',
   lSpo2:'SpO₂ %', lHr:'Heart rate', lThr:'SpO₂ target floor 88%', lHr140:'HR limit 140', lFlag:'Flagged reading', lRx:'Therapy given',
-  vSpo2:'SpO₂', vHr:'Heart rate', vRr:'Resp. rate', vSbp:'Systolic BP', vTemp:'Temperature', vBorg:'Dyspnea · Borg', vNews:'NEWS2 score',
+  vSpo2:'SpO₂', vHr:'Heart rate', vRr:'Resp. rate', vSbp:'Blood pressure', vTemp:'Temperature', vBorg:'Dyspnea · Borg', vWt:'Weight vs dry weight', vNews:'NEWS2 score', uKg:'kg',
   uPct:'%', uBpm:'bpm', uMin:'/min', uMmhg:'mmHg', uC:'°C', uB:'/10', onO2:'on O₂', air:'room air',
   zoneG:'Green · Routine', zoneA:'Amber · Contact team', zoneR:'Red · Urgent action',
   n2Urgent:'urgent review', n2Emerg:'emergency response',
+  gResp:'Respiratory', gCardio:'Cardiac & blood pressure',
+  aBb:'Bisoprolol 2.5 mg PO', aDiur:'Furosemide 40 mg PO · extra dose', aAmlo:'Amlodipine 5 mg PO · intensify', aHoldbp:'Hold next antihypertensive dose + notify',
+  eSkipBBSaba:'Tachycardia follows salbutamol within 60 min — β-blocker withheld; SABA-driven rate expected to settle, re-checking in 15 min', eSkipLowBP:n=>`${n} withheld — systolic BP below 100`, eSkipAmlo:'Amlodipine withheld — systolic already below 150 at dosing time', eHoldBP:'Systolic BP low — next scheduled antihypertensive dose held, physician notified',
+  wHr:'heart rate down ≥10 bpm', wWt:'weight down ≥0.5 kg', wSbp:'systolic down ≥10 mmHg', wSbpUp:'systolic recovered',
+  liveBtnOff:'Connect Apple Watch', liveBtnOn:'Live · Apple Watch — stop', srcWatch:'Apple Watch',
+  liveWait:u=>`Live mode on — waiting for the first reading. From the iPhone (or any browser) send readings to ${u} — see README, "Testing with a real Apple Watch".`,
+  liveOk:(f,ago)=>`Live data connected · ${f} · last reading ${ago} min ago`,
+  liveNoBridge:'Bridge not reachable — run python3 watch_bridge.py and open this page through the address it prints.',
+  eLiveOn:'Live mode on — Apple Watch readings replace the simulation for the fields it sends; clock set to real time', eLiveOff:'Live mode off — back to simulation', eLiveFirst:f=>`First live reading received: ${f}`,
   kAI:'Riati AI monitor', aiStatus:'Reads every reading the minute it arrives, acts only inside the physician’s signed standing orders below, and logs everything it does.',
   aiLastL:'Latest assessment', nextRepL:'Next report to physician', repNow:'Send report now',
   int15:'Report every 15 min', int30:'Report every 30 min', int60:'Report every hour', int120:'Report every 2 hours',
@@ -240,12 +252,12 @@ en: {
   o2title:'Oxygen titration protocol',
   o2w1:'Start', o2w2:'L/min when SpO₂ <', o2w3:'% for 3 min. Adjust ±1 L/min every 10 min to hold', o2w4:'–', o2w5:'%. Max', o2w6:'L/min. Humidify above 4 L/min.',
   ifW:'IF', forW:'for', minW:'min', arrW:'→',
-  mspo2:'SpO₂', mhr:'HR', mrr:'RR', msbp:'SBP', mtemp:'Temp', mborg:'Borg', mnews2:'NEWS2',
+  mspo2:'SpO₂', mhr:'HR', mrr:'RR', msbp:'SBP', mdbp:'DBP', mtemp:'Temp', mborg:'Borg', mwt:'Weight Δ kg', mnews2:'NEWS2',
   aSalb:'Salbutamol 2.5 mg neb', aIpra:'Ipratropium 0.5 mg neb', aPred:'Prednisone 40 mg PO', aO2:'Start O₂ protocol', aNotify:'Notify physician (urgent)', aAlarm:'Emergency alarm', aHold:'Hold SABA 60 min + notify',
   addRule:'Add order', del:'Remove', resetOrders:'Reset orders to guideline defaults',
   kTher:'Direct physician actions', therNote:'Anything given here is recorded exactly like an AI-administered order, and its response is checked the same way.',
   o2lbl:'Oxygen flow', o2stopB:'Stop O₂',
-  kScen:'Scenario · adjustable', scM:'Routine day — brief episodes, AI treats, patient recovers', scS:'Severe AECOPD — poor response', scSt:'Stable night',
+  kScen:'Scenario · adjustable', scM:'Routine day — brief episodes, AI treats, patient recovers', scC:'Cardiac day — tachycardia, fluid gain, BP swing; AI manages per cardiology plan', scS:'Severe AECOPD — poor response', scSt:'Stable night',
   slDetL:'Episode intensity', slRespL:'Therapy responsiveness', scenNote:'In the routine day the patient is stable most of the time; when a brief episode starts, the AI treats it within the standing orders and the patient recovers. Switching scenario restarts the simulation; sliders act live — drop responsiveness to watch therapy fail and the escalation chain fire.',
   kLog:'Reports & event log', fAll:'All', fRep:'Reports', fTher:'Therapies', fAl:'Alerts & alarms',
   ackB:'Acknowledge', eAck:'Alarm acknowledged by physician',
@@ -264,19 +276,28 @@ en: {
   rAssess:'Assessment', rRec:'Recommendation',
   recG:'Continue routine monitoring per the signed plan.', recA:'Contact the patient within the stated time and review therapy response.', recR:'Immediate clinical review required. The patient has been shown the approved emergency instructions, including 997.',
   respEff:'effective', respIneff:'INEFFECTIVE', respPend:'response check pending',
-  ftCites:'Default thresholds derive from published guidance: AARC Clinical Practice Guideline — Oxygen in the Acute Care Setting (2022): SpO₂ 88–92% for COPD, humidify >4 L/min · GOLD 2026 Report: SABA first-line in exacerbation, systemic corticosteroid ≤5 days · Royal College of Physicians NEWS2: score 5–6 urgent review, ≥7 emergency response, Scale 2 for hypercapnic patients.',
+  ftCites:'Default thresholds derive from published guidance: AARC Clinical Practice Guideline — Oxygen in the Acute Care Setting (2022): SpO₂ 88–92% for COPD, humidify >4 L/min · GOLD 2026 Report: SABA first-line in exacerbation, systemic corticosteroid ≤5 days · Royal College of Physicians NEWS2: score 5–6 urgent review, ≥7 emergency response, Scale 2 for hypercapnic patients · Cardioselective β-blockers (bisoprolol) are safe in COPD and should not be withheld — BICS trial and CHEST 2024 review · ESC heart failure guidance: weight gain >2 kg in 3 days → increase diuretic per the patient’s plan · 2025 AHA/ACC hypertension guideline: BP >180/120 without organ damage → intensify oral therapy in the outpatient setting, no acute lowering.',
   ftDisc:'Research prototype with a fully simulated patient. Not a medical device and not clinical advice. Physician remains responsible for every order; the AI only executes and documents. In an emergency in Saudi Arabia call 997.',
   o2flowU:'L/min'
 },
 ar: {
   hSub:'العرض السريري المباشر', langBtn:'English', play:'تشغيل', pause:'إيقاف مؤقت', reset:'إعادة', day:'اليوم',
-  pName:'أحمد م. — مشارك تجريبي', pLine:'٦٣ عامًا · انسداد رئوي مزمن (GOLD III) · احتباس CO₂ معروف · خط الأساس SpO₂ ‎92–94%‎ على الهواء · بورغ الأساسي 2', pSim:'بيانات محاكاة',
+  pName:'أحمد م. — مشارك تجريبي', pLine:'٦٣ عامًا · انسداد رئوي مزمن (GOLD III) · قصور قلب بكسر قذف محفوظ وارتفاع ضغط على بيسوبرولول وأملوديبين · احتباس CO₂ معروف · خط الأساس SpO₂ ‎92–94%‎ على الهواء · الوزن الجاف 78 كغ', pSim:'بيانات محاكاة',
   kMon:'المراقبة الحية · قراءة كل دقيقة', chTitle:'SpO₂ ومعدل النبض · آخر ٣ ساعات',
   lSpo2:'SpO₂ %', lHr:'معدل النبض', lThr:'حد SpO₂ الأدنى 88%', lHr140:'حد النبض 140', lFlag:'قراءة مُعلَّمة', lRx:'علاج مُعطى',
-  vSpo2:'SpO₂', vHr:'معدل النبض', vRr:'معدل التنفس', vSbp:'الضغط الانقباضي', vTemp:'الحرارة', vBorg:'ضيق النفس · بورغ', vNews:'درجة NEWS2',
+  vSpo2:'SpO₂', vHr:'معدل النبض', vRr:'معدل التنفس', vSbp:'ضغط الدم', vTemp:'الحرارة', vBorg:'ضيق النفس · بورغ', vWt:'الوزن مقابل الوزن الجاف', vNews:'درجة NEWS2', uKg:'كغ',
   uPct:'%', uBpm:'ن/د', uMin:'/د', uMmhg:'ملم', uC:'°م', uB:'/10', onO2:'على الأكسجين', air:'هواء الغرفة',
   zoneG:'أخضر · روتيني', zoneA:'أصفر · تواصل مع الفريق', zoneR:'أحمر · إجراء عاجل',
   n2Urgent:'مراجعة عاجلة', n2Emerg:'استجابة طارئة',
+  gResp:'تنفسي', gCardio:'القلب وضغط الدم',
+  aBb:'بيسوبرولول 2.5 ملغ فمويًا', aDiur:'فوروسيمايد 40 ملغ فمويًا · جرعة إضافية', aAmlo:'أملوديبين 5 ملغ فمويًا · تكثيف', aHoldbp:'إيقاف جرعة خافض الضغط التالية + إشعار',
+  eSkipBBSaba:'تسارع النبض جاء بعد سالبوتامول خلال ٦٠ دقيقة — أُمسك حاصر بيتا؛ يُتوقع أن يهدأ النبض الناتج عن الموسّع، وإعادة الفحص بعد ١٥ دقيقة', eSkipLowBP:n=>`أُمسك ${n} — الضغط الانقباضي دون 100`, eSkipAmlo:'أُمسك أملوديبين — الانقباضي أصلًا دون 150 وقت الجرعة', eHoldBP:'انخفاض الضغط الانقباضي — أُوقفت جرعة خافض الضغط المجدولة التالية وأُشعر الطبيب',
+  wHr:'انخفض النبض ≥10 ن/د', wWt:'انخفض الوزن ≥0.5 كغ', wSbp:'انخفض الانقباضي ≥10 ملم', wSbpUp:'تعافى الضغط الانقباضي',
+  liveBtnOff:'اربط Apple Watch', liveBtnOn:'مباشر · Apple Watch — إيقاف', srcWatch:'Apple Watch',
+  liveWait:u=>`الوضع المباشر مفعّل — بانتظار أول قراءة. من الآيفون (أو أي متصفح) أرسل القراءات إلى ${u} — انظر README: الاختبار مع Apple Watch حقيقية.`,
+  liveOk:(f,ago)=>`البيانات المباشرة متصلة · ${f} · آخر قراءة قبل ${ago} د`,
+  liveNoBridge:'الجسر غير متاح — شغّل python3 watch_bridge.py ثم افتح هذه الصفحة من العنوان الذي يطبعه.',
+  eLiveOn:'تفعيل الوضع المباشر — قراءات Apple Watch تحل محل المحاكاة في الحقول التي ترسلها، والساعة على الوقت الحقيقي', eLiveOff:'إيقاف الوضع المباشر — العودة إلى المحاكاة', eLiveFirst:f=>`وصلت أول قراءة مباشرة: ${f}`,
   kAI:'مراقب «رئتي» الذكي', aiStatus:'يقرأ كل قياس لحظة وصوله، ولا يتصرف إلا ضمن الأوامر الدائمة الموقّعة من الطبيب أدناه، ويسجّل كل ما يفعله.',
   aiLastL:'آخر تقييم', nextRepL:'التقرير التالي للطبيب', repNow:'أرسل تقريرًا الآن',
   int15:'تقرير كل ١٥ دقيقة', int30:'تقرير كل ٣٠ دقيقة', int60:'تقرير كل ساعة', int120:'تقرير كل ساعتين',
@@ -284,12 +305,12 @@ ar: {
   o2title:'بروتوكول معايرة الأكسجين',
   o2w1:'ابدأ', o2w2:'لتر/د عندما يهبط SpO₂ دون', o2w3:'% لمدة ٣ دقائق. عدّل ±١ لتر/د كل ١٠ دقائق للبقاء بين', o2w4:'–', o2w5:'%. الحد الأقصى', o2w6:'لتر/د. أضف الترطيب فوق ٤ لتر/د.',
   ifW:'إذا', forW:'لمدة', minW:'د', arrW:'←',
-  mspo2:'SpO₂', mhr:'النبض', mrr:'التنفس', msbp:'الضغط', mtemp:'الحرارة', mborg:'بورغ', mnews2:'NEWS2',
+  mspo2:'SpO₂', mhr:'النبض', mrr:'التنفس', msbp:'الضغط', mdbp:'الانبساطي', mtemp:'الحرارة', mborg:'بورغ', mwt:'تغير الوزن كغ', mnews2:'NEWS2',
   aSalb:'سالبوتامول 2.5 ملغ إرذاذ', aIpra:'إبراتروبيوم 0.5 ملغ إرذاذ', aPred:'بريدنيزون 40 ملغ فمويًا', aO2:'بدء بروتوكول الأكسجين', aNotify:'إشعار الطبيب (عاجل)', aAlarm:'إنذار طارئ', aHold:'إيقاف الموسّع ٦٠ د + إشعار',
   addRule:'إضافة أمر', del:'حذف', resetOrders:'إعادة الأوامر إلى قيم الأدلة السريرية',
   kTher:'إجراءات الطبيب المباشرة', therNote:'كل ما يُعطى هنا يُسجَّل تمامًا كأوامر الذكاء الاصطناعي، ويُقيَّم أثره بالطريقة نفسها.',
   o2lbl:'تدفق الأكسجين', o2stopB:'إيقاف الأكسجين',
-  kScen:'السيناريو · قابل للتعديل', scM:'يوم اعتيادي — نوبات عابرة يعالجها المساعد فيتحسن المريض', scS:'نوبة شديدة — استجابة ضعيفة', scSt:'ليلة مستقرة',
+  kScen:'السيناريو · قابل للتعديل', scM:'يوم اعتيادي — نوبات عابرة يعالجها المساعد فيتحسن المريض', scC:'يوم قلبي — تسارع نبض، احتباس سوائل، تقلّب ضغط؛ يديرها المساعد وفق خطة القلب', scS:'نوبة شديدة — استجابة ضعيفة', scSt:'ليلة مستقرة',
   slDetL:'شدة النوبات', slRespL:'الاستجابة للعلاج', scenNote:'في اليوم الاعتيادي يبقى المريض مستقرًا معظم الوقت؛ وعند بدء نوبة عابرة يعالجها المساعد ضمن الأوامر الدائمة فيتحسن. تغيير السيناريو يعيد المحاكاة، والمنزلقان يعملان مباشرة — أنزل الاستجابة لترى فشل العلاج وتسلسل التصعيد.',
   kLog:'التقارير وسجل الأحداث', fAll:'الكل', fRep:'التقارير', fTher:'العلاجات', fAl:'التنبيهات والإنذارات',
   ackB:'إقرار الاستلام', eAck:'أقرّ الطبيب باستلام الإنذار',
@@ -308,7 +329,7 @@ ar: {
   rAssess:'التقييم', rRec:'التوصية',
   recG:'استمر في المراقبة الروتينية وفق الخطة الموقّعة.', recA:'تواصل مع المريض خلال الوقت المحدد وراجع استجابة العلاج.', recR:'مراجعة سريرية فورية. عُرضت على المريض تعليمات الطوارئ المعتمدة بما فيها 997.',
   respEff:'فعّال', respIneff:'غير فعّال', respPend:'بانتظار فحص الاستجابة',
-  ftCites:'العتبات الافتراضية مستمدة من أدلة منشورة: دليل AARC للأكسجين في الرعاية الحادة (2022): SpO₂ ‏88–92% لمرضى الانسداد الرئوي والترطيب فوق ٤ لتر/د · تقرير GOLD 2026: الموسّع القصير خط أول في النوبة والستيرويد الجهازي ≤٥ أيام · درجة NEWS2 من الكلية الملكية للأطباء: 5–6 مراجعة عاجلة و≥7 استجابة طارئة، والمقياس الثاني لمرضى فرط ثاني أكسيد الكربون.',
+  ftCites:'العتبات الافتراضية مستمدة من أدلة منشورة: دليل AARC للأكسجين في الرعاية الحادة (2022): SpO₂ ‏88–92% لمرضى الانسداد الرئوي والترطيب فوق ٤ لتر/د · تقرير GOLD 2026: الموسّع القصير خط أول في النوبة والستيرويد الجهازي ≤٥ أيام · درجة NEWS2 من الكلية الملكية للأطباء: 5–6 مراجعة عاجلة و≥7 استجابة طارئة، والمقياس الثاني لمرضى فرط ثاني أكسيد الكربون · حاصرات بيتا الانتقائية للقلب (بيسوبرولول) آمنة في الانسداد الرئوي ولا تُحجب — تجربة BICS ومراجعة CHEST 2024 · إرشادات ESC لقصور القلب: زيادة الوزن >٢ كغ خلال ٣ أيام ← زيادة مدرّ البول وفق خطة المريض · دليل AHA/ACC 2025 لضغط الدم: >180/120 دون تلف عضوي ← تكثيف العلاج الفموي في العيادة الخارجية دون خفض حاد.',
   ftDisc:'نموذج بحثي بمريض محاكى بالكامل. ليس جهازًا طبيًا ولا نصيحة سريرية. يبقى الطبيب مسؤولًا عن كل أمر؛ الذكاء الاصطناعي ينفّذ ويوثّق فقط. في الطوارئ داخل المملكة اتصل بـ 997.',
   o2flowU:'لتر/د'
 }};
@@ -317,34 +338,83 @@ try{ L = localStorage.getItem('riati_lang')==='ar' ? 'ar':'en'; }catch(e){}
 const t = k => T[L][k];
 
 /* ================= state ================= */
-const METRICS = ['spo2','hr','rr','sbp','temp','borg','news2'];
-const TILES = ['spo2','hr','rr','sbp','temp','borg']; // NEWS2 runs in the background; surfaces only when elevated
-const MMETA = {spo2:{u:'uPct',dec:0},hr:{u:'uBpm',dec:0},rr:{u:'uMin',dec:0},sbp:{u:'uMmhg',dec:0},temp:{u:'uC',dec:1},borg:{u:'uB',dec:1},news2:{u:'',dec:0}};
-const ACTIONS = ['salb','ipra','pred','o2','notify','alarm','hold'];
-const DRUGNAME = {salb:'aSalb',ipra:'aIpra',pred:'aPred'};
+const METRICS = ['spo2','hr','rr','sbp','temp','borg','wt','news2'];
+const TILES = ['spo2','hr','rr','sbp','temp','borg','wt']; // NEWS2 runs in the background; surfaces only when elevated
+const MMETA = {spo2:{u:'uPct',dec:0},hr:{u:'uBpm',dec:0},rr:{u:'uMin',dec:0},sbp:{u:'uMmhg',dec:0},dbp:{u:'uMmhg',dec:0},temp:{u:'uC',dec:1},borg:{u:'uB',dec:1},wt:{u:'uKg',dec:1,signed:true},news2:{u:'',dec:0}};
+const VLBL = {spo2:'Spo2',hr:'Hr',rr:'Rr',sbp:'Sbp',temp:'Temp',borg:'Borg',wt:'Wt',news2:'News'};
+const fmtV = (k,v)=>{ const m=MMETA[k]||{dec:0}; return (m.signed&&v>=0?'+':'')+(+v).toFixed(m.dec); };
+const ACTIONS = ['salb','ipra','pred','o2','bb','diur','amlo','holdbp','notify','alarm','hold'];
+const ALABEL = {salb:'aSalb',ipra:'aIpra',pred:'aPred',o2:'aO2',bb:'aBb',diur:'aDiur',amlo:'aAmlo',holdbp:'aHoldbp',notify:'aNotify',alarm:'aAlarm',hold:'aHold'};
+const DRUGNAME = {salb:'aSalb',ipra:'aIpra',pred:'aPred',bb:'aBb',diur:'aDiur',amlo:'aAmlo',holdbp:'aHoldbp'};
+const CARDIO_ACTIONS = ['bb','diur','amlo','holdbp'];
+// per-drug minimum interval (min) and how long after dosing the AI checks the response
+const DRUG = {salb:{cd:20,check:25}, ipra:{cd:240,check:25}, pred:{cd:1440,check:null}, bb:{cd:720,check:60}, diur:{cd:1440,check:360}, amlo:{cd:1440,check:240}, holdbp:{cd:1440,check:120}};
+
+/* ================= live device bridge (watch_bridge.py) ================= */
+const LIVE = {on:false, data:{}, ok:false, url:'', seen:false};
+const FRESH = {hr:15, spo2:120, rr:120, sbp:1440, dbp:1440, temp:240, wt:1440, borg:240}; // minutes a live reading stays valid before the simulation resumes for that field
+function liveFresh(k){ const d=LIVE.data[k]; return d && (Date.now()-d.ts)/60000 <= FRESH[k] ? d : null; }
+function applyLive(v){ for(const k of Object.keys(FRESH)){ const d=liveFresh(k); if(d) v[k] = (k==='temp'||k==='wt') ? +(+d.v).toFixed(1) : Math.round(+d.v); } }
+async function pollLive(){
+  if(!LIVE.on) return;
+  try{
+    const r = await fetch('live?ts='+Date.now(), {cache:'no-store'}); const j = await r.json();
+    LIVE.ok = true; LIVE.data = j.data||{}; LIVE.url = 'http://'+j.ip+':'+j.port+'/ingest?hr=72&spo2=96';
+    const newest = Math.max(0, ...Object.values(LIVE.data).map(d=>d.ts||0));
+    if(newest > (LIVE.lastTs||0)){ LIVE.lastTs = newest; applyLive(S.vit); renderTiles(); }   // show a new reading at once, not at the next minute tick
+    if(!LIVE.seen && Object.keys(LIVE.data).length){ LIVE.seen=true; log('ai', ()=>t('eLiveFirst')(Object.keys(LIVE.data).map(k=>t('m'+k)).join(', '))); }
+  }catch(e){ LIVE.ok=false; }
+  renderLiveStatus();
+}
+function renderLiveStatus(){
+  el.liveBtn.textContent = LIVE.on ? t('liveBtnOn') : t('liveBtnOff');
+  el.liveBtn.classList.toggle('btn-primary', LIVE.on);
+  el.liveStatus.hidden = !LIVE.on;
+  if(!LIVE.on) return;
+  if(!LIVE.ok){ el.liveStatus.textContent = t('liveNoBridge'); return; }
+  const fresh = Object.keys(FRESH).filter(k=>liveFresh(k));
+  if(!fresh.length){ el.liveStatus.textContent = t('liveWait')(LIVE.url); return; }
+  const newest = Math.max(...fresh.map(k=>LIVE.data[k].ts));
+  el.liveStatus.textContent = t('liveOk')(fresh.map(k=>t('m'+k)).join(' · '), Math.max(0, Math.round((Date.now()-newest)/60000)));
+}
+function toggleLive(){
+  LIVE.on = !LIVE.on;
+  if(LIVE.on){
+    const n=new Date(); S.baseMin = n.getHours()*60+n.getMinutes()-S.minute;   // sim clock now reads real wall-clock time
+    S.speed=1; S.scen='stable'; S.epi.active=null; S.epi.next=1e9;             // no invented episodes on top of real readings
+    log('ai', ()=>t('eLiveOn')); pollLive();
+  } else { S.speed=60; S.baseMin=480; log('ai', ()=>t('eLiveOff')); }
+  renderStatic();
+}
+setInterval(pollLive, 3000);
 
 const defaultProto = () => ({on:true, low:88, high:92, start:2, max:6, every:10, lastT:-999});
 const defaultRules = () => ([
-  {id:'r1',on:true,metric:'spo2',op:'<', val:88, sus:3, action:'o2',    cd:15, builtin:true, cite:'AARC'},
-  {id:'r2',on:true,metric:'borg',op:'>=',val:5,  sus:5, action:'salb',  cd:20, builtin:true, cite:'GOLD'},
-  {id:'r3',on:true,metric:'rr',  op:'>=',val:25, sus:5, action:'salb',  cd:20, builtin:true, cite:'GOLD'},
-  {id:'r4',on:true,metric:'hr',  op:'>=',val:140,sus:5, action:'hold',  cd:30, builtin:true, cite:''},
-  {id:'r5',on:true,metric:'news2',op:'>=',val:7, sus:2, action:'alarm', cd:20, builtin:true, cite:'NEWS2'},
-  {id:'r6',on:true,metric:'news2',op:'>=',val:5, sus:5, action:'notify',cd:30, builtin:true, cite:'NEWS2'},
-  {id:'r7',on:true,metric:'temp',op:'>=',val:38.5,sus:10,action:'notify',cd:120,builtin:true, cite:'GOLD'},
+  {id:'r1', g:'resp',  on:true,metric:'spo2', op:'<', val:88,  sus:3, action:'o2',    cd:15,  builtin:true, cite:'AARC'},
+  {id:'r2', g:'resp',  on:true,metric:'borg', op:'>=',val:5,   sus:5, action:'salb',  cd:20,  builtin:true, cite:'GOLD'},
+  {id:'r3', g:'resp',  on:true,metric:'rr',   op:'>=',val:25,  sus:5, action:'salb',  cd:20,  builtin:true, cite:'GOLD'},
+  {id:'r4', g:'resp',  on:true,metric:'hr',   op:'>=',val:140, sus:5, action:'hold',  cd:30,  builtin:true, cite:''},
+  {id:'r5', g:'resp',  on:true,metric:'news2',op:'>=',val:7,   sus:2, action:'alarm', cd:20,  builtin:true, cite:'NEWS2'},
+  {id:'r6', g:'resp',  on:true,metric:'news2',op:'>=',val:5,   sus:5, action:'notify',cd:30,  builtin:true, cite:'NEWS2'},
+  {id:'r7', g:'resp',  on:true,metric:'temp', op:'>=',val:38.5,sus:10,action:'notify',cd:120, builtin:true, cite:'GOLD'},
+  {id:'r8', g:'cardio',on:true,metric:'hr',   op:'>=',val:115, sus:30,action:'bb',    cd:720, builtin:true, cite:'BICS'},
+  {id:'r9', g:'cardio',on:true,metric:'sbp',  op:'<=',val:95,  sus:10,action:'holdbp',cd:240, builtin:true, cite:'NEWS2'},
+  {id:'r10',g:'cardio',on:true,metric:'sbp',  op:'>=',val:180, sus:15,action:'amlo',  cd:1440,builtin:true, cite:'AHA/ACC 2025'},
+  {id:'r11',g:'cardio',on:true,metric:'wt',   op:'>=',val:2,   sus:60,action:'diur',  cd:1440,builtin:true, cite:'ESC HF'},
 ]);
 
 let S; // sim state
 function freshState(scen){
   return {
-    scen: scen||'moderate', running:true, speed:60, simSec:0, minute:0,
+    scen: scen||'moderate', running:true, speed:60, simSec:0, minute:0, baseMin:480,
     detRate: +document.getElementById('slDet').value/100 || 1,
     resp: +document.getElementById('slResp').value/100,
-    vit:{spo2:93,hr:90,rr:19,sbp:124,temp:36.8,borg:2.5,news2:0},
-    epi:{next:30+Math.random()*20, active:null},
+    vit:{spo2:93,hr:90,rr:19,sbp:124,dbp:76,temp:36.8,borg:2.5,wt:0.2,news2:0},
+    epi:{next:(scen==='cardiac'?25:30+Math.random()*20), active:null},
     o2:0, hist:[], events:[], evSeq:0,
     drugs:[], // {rx, at, mag}
-    drugLast:{salb:-999,ipra:-999,pred:-999},
+    drugLast:{salb:-99999,ipra:-99999,pred:-99999,bb:-99999,diur:-99999,amlo:-99999,holdbp:-99999}, // "never given" must sit beyond the longest minimum interval (1440 min)
+    skipNoted:{},
     salbTimes:[], sabaHoldUntil:-1, sabaMaxFlag:false,
     checks:[], ineff:{}, sustain:{}, ruleLast:{},
     lastReport:0, alarm:null, lastBeep:0,
@@ -355,17 +425,28 @@ let proto = defaultProto();
 let rules = defaultRules();
 let repInterval = 60;
 try{
-  const saved = JSON.parse(localStorage.getItem('riati_demo_orders_v2')||'null');
+  const saved = JSON.parse(localStorage.getItem('riati_demo_orders_v3')||'null');
   if(saved){ proto = {...defaultProto(), ...saved.proto}; rules = saved.rules; repInterval = saved.interval||60; }
 }catch(e){}
-function persistOrders(){ try{ localStorage.setItem('riati_demo_orders_v2', JSON.stringify({proto, rules, interval:repInterval})); }catch(e){} }
+function persistOrders(){ try{ localStorage.setItem('riati_demo_orders_v3', JSON.stringify({proto, rules, interval:repInterval})); }catch(e){} }
 
 /* ================= patient model ================= */
+function cardioEvents(m){
+  if(S.scen!=='cardiac') return {hrEp:0, wtBase:0, sbpEp:0};
+  const d=S.detRate;
+  const bump=(start,rise,peak,tau)=>{ const age=m-start; if(age<0) return 0; return age<=rise ? peak*age/rise : peak*Math.exp(-(age-rise)/tau); };
+  return {
+    hrEp:   bump(40,15,30*d,600),                              // sustained fast rate (AF-like); persists for hours if untreated
+    wtBase: Math.min(2.4*d, 0.014*m*d),                        // fluid retention creeping up through the day
+    sbpEp:  bump(330,20,72*d,240) + bump(700,20,-36*d,150)     // hypertensive spike, then a post-diuresis dip
+  };
+}
 function baseSeverity(m){
   const d = S.detRate;
-  if(S.scen==='moderate'){
+  if(S.scen==='moderate'||S.scen==='cardiac'){
     // stable baseline; brief episodes flare up, then resolve (faster once treated)
-    if(!S.epi.active && m>=S.epi.next) S.epi.active={start:m, peak:(2.2+Math.random()*1.2)*d, rise:22, fall:85};
+    // cardiac day opens with a firm respiratory episode so the salbutamol → tachycardia → β-blocker interlock is exercised
+    if(!S.epi.active && m>=S.epi.next) S.epi.active={start:m, peak:(S.scen==='cardiac'&&m<60 ? 3.3 : 2.2+Math.random()*1.2)*d, rise:22, fall:85};
     let ep=0;
     const a=S.epi.active;
     if(a){
@@ -379,16 +460,20 @@ function baseSeverity(m){
   return 2 + 0.5*Math.sin(m/38) * d;
 }
 function drugEffect(m){
-  let b=0, salbActive=0;
+  let b=0, salbActive=0, hrEff=0, sbpEff=0, wtEff=0;
   for(const d of S.drugs){
     const age = m - d.at; if(age<0) continue;
     let e=0;
     if(d.rx==='salb'){ e = d.mag * Math.min(1,age/14) * Math.exp(-Math.max(0,age-14)/110); if(e>0.15) salbActive++; }
-    if(d.rx==='ipra'){ e = d.mag * Math.min(1,age/20) * Math.exp(-Math.max(0,age-20)/220); }
-    if(d.rx==='pred'){ e = d.mag * Math.min(1,age/240); }
+    else if(d.rx==='ipra'){ e = d.mag * Math.min(1,age/20) * Math.exp(-Math.max(0,age-20)/220); }
+    else if(d.rx==='pred'){ e = d.mag * Math.min(1,age/240); }
+    else if(d.rx==='bb'){ const k=Math.min(1,age/60)*Math.exp(-Math.max(0,age-60)/800); hrEff+=d.mag*k; sbpEff+=6*k; }
+    else if(d.rx==='diur'){ const k=Math.min(1,age/90)*Math.exp(-Math.max(0,age-90)/900); wtEff+=d.mag*k; sbpEff+=5*k; }
+    else if(d.rx==='amlo'){ const k=Math.min(1,age/240)*Math.exp(-Math.max(0,age-240)/1200); sbpEff+=d.mag*k; }
+    else if(d.rx==='holdbp'){ const k=Math.min(1,age/60)*Math.exp(-Math.max(0,age-60)/400); sbpEff-=8*k; }
     b+=e;
   }
-  return {b, salbActive};
+  return {b, salbActive, hrEff, sbpEff, wtEff};
 }
 function news2(v,onO2){
   const s={};
@@ -408,27 +493,32 @@ function news2(v,onO2){
 const rnd = (()=>{ let seed=7; return ()=>{ seed=(seed*9301+49297)%233280; return seed/233280-0.5; };})();
 function stepMinute(m){
   S.resp = +el.slResp.value/100; S.detRate = +el.slDet.value/100;
-  const {b, salbActive} = drugEffect(m);
+  const {b, salbActive, hrEff, sbpEff, wtEff} = drugEffect(m);
   const Seff = Math.max(0, Math.min(12, baseSeverity(m) - b));
+  const ce = cardioEvents(m);
   const o2boost = S.o2>0 ? 5.4*(1-Math.exp(-S.o2/2.6)) : 0;
   const v = S.vit;
   const tgt = {
     spo2: Math.max(70, Math.min(99.5, 97.2 - 1.45*Seff + o2boost)),
-    hr:   78 + 4.6*Seff + 8*salbActive + (v.spo2<86?12:0),
+    hr:   Math.max(45, 78 + 4.6*Seff + 8*salbActive + (v.spo2<86?12:0) + ce.hrEp - hrEff),
     rr:   13.5 + 2.1*Seff,
-    sbp:  121 + 1.8*Seff,
+    sbp:  Math.max(70, 121 + 1.8*Seff + ce.sbpEp - sbpEff),
     temp: 36.7 + (S.scen==='severe'?0.16:0.06)*Seff,
-    borg: Math.max(0, Math.min(10, 0.9 + 0.85*Seff))
+    borg: Math.max(0, Math.min(10, 0.9 + 0.85*Seff)),
+    wt:   0.2 + ce.wtBase - wtEff
   };
   v.spo2 = Math.round((v.spo2 + (tgt.spo2-v.spo2)*.28 + rnd()*.7)*10)/10;
   v.hr   = Math.round(v.hr   + (tgt.hr-v.hr)*.3  + rnd()*3.4);
   v.rr   = Math.round(v.rr   + (tgt.rr-v.rr)*.3  + rnd()*1.4);
   v.sbp  = Math.round(v.sbp  + (tgt.sbp-v.sbp)*.25+ rnd()*4);
+  v.dbp  = Math.round(0.6*v.sbp + 4 + rnd()*3);
   v.temp = Math.round((v.temp+ (tgt.temp-v.temp)*.2 + rnd()*.08)*10)/10;
   v.borg = Math.round((v.borg+ (tgt.borg-v.borg)*.3+ rnd()*.3)*2)/2;
+  v.wt   = Math.round((v.wt  + (tgt.wt-v.wt)*.2   + rnd()*.06)*10)/10;
+  if(LIVE.on) applyLive(v);   // real device readings override the simulated ones for whatever fields arrived
   const nw = news2(v, S.o2>0);
   v.news2 = nw.total; S.news2Score = nw;
-  S.hist.push({m, spo2:v.spo2, hr:v.hr, rr:v.rr, sbp:v.sbp, temp:v.temp, borg:v.borg, news2:v.news2, o2:S.o2});
+  S.hist.push({m, spo2:v.spo2, hr:v.hr, rr:v.rr, sbp:v.sbp, dbp:v.dbp, temp:v.temp, borg:v.borg, wt:v.wt, news2:v.news2, o2:S.o2});
   if(S.hist.length>1500) S.hist.shift();
   aiTick(m, v, nw);
 }
@@ -450,25 +540,33 @@ function alarmOn(mkTitle){
 }
 function opTest(op,a,b){ return op==='<'?a<b : op==='<='?a<=b : op==='>'?a>b : a>=b; }
 function giveDrug(rx, by, m){
-  if((rx==='salb') ){
-    if(S.sabaHoldUntil>m){ return false; }
-    if(m - S.drugLast.salb < 20) return false;
+  const v=S.vit, nm=()=>t(DRUGNAME[rx]);
+  // a withheld order is explained once per hour, not on every re-evaluation
+  const note=(key,mk)=>{ if(S.skipNoted[key]!==undefined && m-S.skipNoted[key]<60) return; S.skipNoted[key]=m; log('ai', mk); };
+  if(rx==='salb'){
+    if(S.sabaHoldUntil>m) return false;
+    if(m - S.drugLast.salb < DRUG.salb.cd) return false;
     S.salbTimes = S.salbTimes.filter(x=>m-x<60);
     if(S.salbTimes.length>=3){
       if(!S.sabaMaxFlag){ S.sabaMaxFlag=true; log('alert', ()=>t('eSabaMax')); }
       return false;
     }
-    S.salbTimes.push(m); S.sabaMaxFlag=false;
+  } else if(m - S.drugLast[rx] < DRUG[rx].cd) return false;
+  // safety interlocks — checked against the live readings before any cardiac or BP order
+  if(rx==='bb'){
+    if(m - S.drugLast.salb < 60){ note('bbSaba', ()=>t('eSkipBBSaba')); return false; }
+    if(v.sbp<100){ note('bbLow', ()=>t('eSkipLowBP')(nm())); return false; }
+    if(v.hr<100) return false;
   }
-  if(rx==='ipra' && m-S.drugLast.ipra<240) return false;
-  if(rx==='pred' && m-S.drugLast.pred<1440) return false;
+  if(rx==='diur' && v.sbp<100){ note('diurLow', ()=>t('eSkipLowBP')(nm())); return false; }
+  if(rx==='amlo' && v.sbp<150){ note('amloLow', ()=>t('eSkipAmlo')); return false; }
+  if(rx==='salb'){ S.salbTimes.push(m); S.sabaMaxFlag=false; }
   S.drugLast[rx]=m;
-  const mag = rx==='salb'?2.3*S.resp : rx==='ipra'?1.3*S.resp : 1.6*S.resp;
+  const mag = {salb:2.3, ipra:1.3, pred:1.6, bb:18, diur:1.0, amlo:14, holdbp:1}[rx]*S.resp;
   S.drugs.push({rx, at:m, mag});
   if(S.epi.active && (rx==='salb'||rx==='ipra')) S.epi.active.fall = Math.max(16, 70*(1-S.resp));
-  const nameK = DRUGNAME[rx];
-  log('therapy', ()=>t('eGive')(t(nameK)), ()=>t(by));
-  if(rx!=='pred') S.checks.push({due:m+25, rx, base:{...S.vit}});
+  log('therapy', rx==='holdbp' ? ()=>t('eHoldBP') : ()=>t('eGive')(nm()), ()=>t(by));
+  if(DRUG[rx].check) S.checks.push({due:m+DRUG[rx].check, rx, base:{...S.vit}});
   return true;
 }
 function o2Set(f, mk){
@@ -477,11 +575,12 @@ function o2Set(f, mk){
 }
 function runAction(rule, m){
   const a=rule.action;
-  if(a==='o2'){ if(proto.on && S.o2===0){ o2Set(proto.start, ()=>t('eO2Start')(proto.start)); S.checks.push({due:m+20, rx:'o2', base:{...S.vit}}); } }
-  else if(a==='salb'||a==='ipra'||a==='pred'){ giveDrug(a,'byAI',m); }
-  else if(a==='notify'){ log('alert', rule.metric==='news2' ? ()=>t('eNews5')(S.vit.news2) : rule.metric==='temp' ? ()=>t('eTemp')(S.vit.temp) : ()=>t('eRuleFire')(t('m'+rule.metric), rule.op, rule.val)); }
-  else if(a==='alarm'){ const mk=()=>t('eNews7')(S.vit.news2); log('alarm', mk); alarmOn(mk); sendReport(m,true); }
-  else if(a==='hold'){ S.sabaHoldUntil=m+60; const mk=()=>t('eHold')(rule.val); log('alarm', mk); alarmOn(mk); }
+  if(a==='o2'){ if(proto.on && S.o2===0){ o2Set(proto.start, ()=>t('eO2Start')(proto.start)); S.checks.push({due:m+20, rx:'o2', base:{...S.vit}}); return true; } return false; }
+  if(DRUG[a]) return giveDrug(a,'byAI',m);
+  if(a==='notify'){ log('alert', rule.metric==='news2' ? ()=>t('eNews5')(S.vit.news2) : rule.metric==='temp' ? ()=>t('eTemp')(S.vit.temp) : ()=>t('eRuleFire')(t('m'+rule.metric), rule.op, rule.val)); return true; }
+  if(a==='alarm'){ const mk=()=>t('eNews7')(S.vit.news2); log('alarm', mk); alarmOn(mk); sendReport(m,true); return true; }
+  if(a==='hold'){ S.sabaHoldUntil=m+60; const mk=()=>t('eHold')(rule.val); log('alarm', mk); alarmOn(mk); return true; }
+  return false;
 }
 function aiTick(m, v, nw){
   // standing orders
@@ -489,8 +588,9 @@ function aiTick(m, v, nw){
     if(!r.on) continue;
     const val = v[r.metric]; if(val==null) continue;
     S.sustain[r.id] = opTest(r.op, val, r.val) ? (S.sustain[r.id]||0)+1 : 0;
-    if(S.sustain[r.id]>=r.sus && m-(S.ruleLast[r.id]??-999)>=r.cd){
-      S.ruleLast[r.id]=m; runAction(r,m);
+    if(S.sustain[r.id]>=r.sus && m-(S.ruleLast[r.id]??-99999)>=r.cd){
+      const done = runAction(r,m);
+      S.ruleLast[r.id] = done ? m : m - r.cd + 15; // an order withheld by an interlock is re-evaluated in 15 min, not after the full cooldown
     }
   }
   // O2 titration
@@ -509,13 +609,17 @@ function aiTick(m, v, nw){
   for(const c of S.checks.filter(c=>c.due===m)){
     let eff=false, whyK='';
     if(c.rx==='o2'){ eff = v.spo2>=proto.low; whyK='wSpo2'; }
+    else if(c.rx==='bb'){ eff = v.hr<=c.base.hr-10; whyK='wHr'; }
+    else if(c.rx==='diur'){ eff = v.wt<=c.base.wt-0.5; whyK='wWt'; }
+    else if(c.rx==='amlo'){ eff = v.sbp<=c.base.sbp-10; whyK='wSbp'; }
+    else if(c.rx==='holdbp'){ eff = v.sbp>=c.base.sbp+5; whyK='wSbpUp'; }
     else { eff = (v.borg<=c.base.borg-0.8)||(v.rr<=c.base.rr-3); whyK='wBorg'; }
-    const nameK = c.rx==='o2' ? null : DRUGNAME[c.rx];
-    const nm = ()=> c.rx==='o2' ? 'O₂' : t(nameK);
+    const nm = ()=> c.rx==='o2' ? 'O₂' : t(DRUGNAME[c.rx]);
+    const mins = c.rx==='o2' ? 20 : DRUG[c.rx].check;
     if(eff){ S.ineff[c.rx]=0; log('ai', ()=>t('eEff')(nm(), t(whyK))); }
     else{
       S.ineff[c.rx]=(S.ineff[c.rx]||0)+1;
-      const mk = ()=>t('eIneff')(nm(), 25);
+      const mk = ()=>t('eIneff')(nm(), mins);
       log(S.ineff[c.rx]>=2?'alarm':'alert', mk);
       if(S.ineff[c.rx]>=2) alarmOn(mk);
       sendReport(m,true);
@@ -533,7 +637,7 @@ function stat(win,k){
   const third = Math.max(1,Math.floor(vals.length/3));
   const a = vals.slice(0,third).reduce((x,y)=>x+y,0)/third;
   const b = vals.slice(-third).reduce((x,y)=>x+y,0)/third;
-  const eps = {spo2:.6,hr:4,rr:1.5,sbp:4,temp:.2,borg:.5,news2:.7}[k]||1;
+  const eps = {spo2:.6,hr:4,rr:1.5,sbp:4,temp:.2,borg:.5,wt:.3,news2:.7}[k]||1;
   return {cur, mn, mx, trend: b-a>eps?'↑': a-b>eps?'↓':'→'};
 }
 function zoneOf(nw){ return nw.total>=7?'R': (nw.total>=5||nw.single3)?'A':'G'; }
@@ -551,9 +655,9 @@ function sendReport(m, exception){
 
 /* ================= rendering ================= */
 const el={};
-['alarmbar','alarmTxt','ackBtn','clock','playBtn','resetBtn','langBtn','speedSeg','hSub','pName','pLine','pSim','pInitial','zoneChip','news2Chip','kMon','tiles','chTitle','chLegend','chart','kLog','filters','log','kAI','aiStatus','aiLastL','aiLast','nextRepL','nextRep','repInt','repNowBtn','kOrders','ordersNote','o2on','o2title','o2words','rules','addRow','resetOrdersBtn','kTher','therNote','therBtns','o2lbl','o2minus','o2plus','o2now','o2stop','kScen','scenBtns','slDet','slDetV','slDetL','slResp','slRespV','slRespL','scenNote','ftCites','ftDisc'].forEach(id=>el[id]=document.getElementById(id));
+['alarmbar','alarmTxt','ackBtn','clock','playBtn','resetBtn','liveBtn','liveStatus','langBtn','speedSeg','hSub','pName','pLine','pSim','pInitial','zoneChip','news2Chip','kMon','tiles','chTitle','chLegend','chart','kLog','filters','log','kAI','aiStatus','aiLastL','aiLast','nextRepL','nextRep','repInt','repNowBtn','kOrders','ordersNote','o2on','o2title','o2words','rules','addRow','resetOrdersBtn','kTher','therNote','therBtns','o2lbl','o2minus','o2plus','o2now','o2stop','kScen','scenBtns','slDet','slDetV','slDetL','slResp','slRespV','slRespL','scenNote','ftCites','ftDisc'].forEach(id=>el[id]=document.getElementById(id));
 
-function fmtT(m){ const total=8*60+m; const d=Math.floor(total/1440)+1, hh=String(Math.floor(total/60)%24).padStart(2,'0'), mm=String(total%60).padStart(2,'0'); return t('day')+' '+d+' · '+hh+':'+mm; }
+function fmtT(m){ const total=(S.baseMin||480)+m; const d=Math.floor(total/1440)+1, hh=String(Math.floor(total/60)%24).padStart(2,'0'), mm=String(total%60).padStart(2,'0'); return t('day')+' '+d+' · '+hh+':'+mm; }
 const ZC={G:['var(--green)','zoneG'],A:['var(--amber)','zoneA'],R:['var(--red)','zoneR']};
 
 function renderStatic(){
@@ -581,18 +685,18 @@ function renderStatic(){
   el.slDetL.textContent=t('slDetL'); el.slRespL.textContent=t('slRespL');
   el.ftCites.textContent=t('ftCites'); el.ftDisc.textContent=t('ftDisc');
   // speed segment
-  el.speedSeg.innerHTML=[[1,'×1'],[60,'×60'],[300,'×300']].map(([v,l])=>'<button data-v="'+v+'" class="'+(S.speed===v?'on':'')+'" dir="ltr">'+l+'</button>').join('');
+  el.speedSeg.innerHTML=[[1,'×1'],[60,'×60'],[300,'×300']].map(([v,l])=>'<button data-v="'+v+'" class="'+(S.speed===v?'on':'')+'" dir="ltr"'+(LIVE.on?' disabled title="real time while live"':'')+'>'+l+'</button>').join('');
   el.speedSeg.querySelectorAll('button').forEach(b=>b.onclick=()=>{S.speed=+b.dataset.v;renderStatic();});
   // therapy buttons
   el.therBtns.innerHTML='';
-  [['salb','aSalb'],['ipra','aIpra'],['pred','aPred']].forEach(([rx,k])=>{
+  [['salb','aSalb'],['ipra','aIpra'],['pred','aPred'],['bb','aBb'],['diur','aDiur'],['amlo','aAmlo'],['holdbp','aHoldbp']].forEach(([rx,k])=>{
     const b=document.createElement('button'); b.className='btn'; b.textContent=t(k);
     b.onclick=()=>{ giveDrug(rx,'byDoc',S.minute); renderAll(); };
     el.therBtns.appendChild(b);
   });
   // scenario buttons
   el.scenBtns.innerHTML='';
-  [['moderate','scM',85],['severe','scS',25],['stable','scSt',85]].forEach(([sc,k,resp])=>{
+  [['moderate','scM',85],['cardiac','scC',85],['severe','scS',25],['stable','scSt',85]].forEach(([sc,k,resp])=>{
     const b=document.createElement('button'); b.className='chip'+(S.scen===sc?' on':''); b.style.textAlign='start'; b.textContent=t(k);
     b.onclick=()=>{ el.slResp.value=resp; reset(sc); };
     el.scenBtns.appendChild(b);
@@ -615,14 +719,18 @@ function renderOrders(){
   el.o2words.innerHTML=w('o2w1')+inp('start',proto.start)+w('o2w2')+inp('low',proto.low)+w('o2w3')+inp('low2',proto.low)+w('o2w4')+inp('high',proto.high)+w('o2w5')+inp('max',proto.max)+w('o2w6');
   el.o2words.querySelectorAll('input').forEach(i=>i.onchange=()=>{ const k=i.dataset.p==='low2'?'low':i.dataset.p; proto[k]=+i.value; persistOrders(); renderOrders(); });
   el.rules.innerHTML='';
-  for(const r of rules){
+  let lastG=null;
+  const ordered=[...rules].sort((a,b)=>((a.g||'resp')==='resp'?0:1)-((b.g||'resp')==='resp'?0:1));
+  for(const r of ordered){
+    const g=r.g||'resp';
+    if(g!==lastG){ lastG=g; const h=document.createElement('div'); h.className='rgroup'; h.textContent=t(g==='resp'?'gResp':'gCardio'); el.rules.appendChild(h); }
     const row=document.createElement('div'); row.className='rule'+(r.on?'':' off');
     row.innerHTML='<input type="checkbox" class="switch" '+(r.on?'checked':'')+'>'
       +'<span class="word">'+t('ifW')+'</span><span class="metr">'+t('m'+r.metric)+'</span>'
       +'<span dir="ltr" style="color:var(--mut)">'+r.op+'</span>'
-      +'<input type="number" class="num small" data-k="val" value="'+r.val+'" step="'+(r.metric==='temp'?0.1:1)+'">'
+      +'<input type="number" class="num small" data-k="val" value="'+r.val+'" step="'+((r.metric==='temp'||r.metric==='wt')?0.1:1)+'">'
       +'<span class="word">'+t('forW')+'</span><input type="number" class="num small" data-k="sus" value="'+r.sus+'"><span class="word">'+t('minW')+'</span>'
-      +'<span class="word">'+t('arrW')+'</span><span class="act">'+t('a'+({salb:'Salb',ipra:'Ipra',pred:'Pred',o2:'O2',notify:'Notify',alarm:'Alarm',hold:'Hold'})[r.action])+'</span>'
+      +'<span class="word">'+t('arrW')+'</span><span class="act">'+t(ALABEL[r.action])+'</span>'
       +(r.cite?'<span class="cite">'+r.cite+'</span>':'')
       +(!r.builtin?'<button class="btn" style="font-size:11px;padding:3px 10px">'+t('del')+'</button>':'');
     row.querySelector('.switch').onchange=e=>{r.on=e.target.checked;persistOrders();renderOrders();};
@@ -632,7 +740,7 @@ function renderOrders(){
   }
   // add row
   const mOpts=METRICS.map(m=>'<option value="'+m+'">'+t('m'+m)+'</option>').join('');
-  const aOpts=ACTIONS.map(a=>'<option value="'+a+'">'+t('a'+({salb:'Salb',ipra:'Ipra',pred:'Pred',o2:'O2',notify:'Notify',alarm:'Alarm',hold:'Hold'})[a])+'</option>').join('');
+  const aOpts=ACTIONS.map(a=>'<option value="'+a+'">'+t(ALABEL[a])+'</option>').join('');
   el.addRow.innerHTML='<span class="word" style="font-size:12px;color:var(--mut)">'+t('ifW')+'</span>'
     +'<select class="sel" id="nrM">'+mOpts+'</select>'
     +'<select class="sel" id="nrO" dir="ltr"><option><</option><option><=</option><option>></option><option selected>>=</option></select>'
@@ -641,7 +749,8 @@ function renderOrders(){
     +'<select class="sel" id="nrA">'+aOpts+'</select>'
     +'<button class="btn btn-primary" id="nrAdd" style="font-size:12px">'+t('addRule')+'</button>';
   document.getElementById('nrAdd').onclick=()=>{
-    rules.push({id:'c'+Date.now(),on:true,metric:document.getElementById('nrM').value,op:document.getElementById('nrO').value,val:+document.getElementById('nrV').value,sus:+document.getElementById('nrS').value,action:document.getElementById('nrA').value,cd:20,builtin:false,cite:''});
+    const action=document.getElementById('nrA').value;
+    rules.push({id:'c'+Date.now(),g:CARDIO_ACTIONS.includes(action)?'cardio':'resp',on:true,metric:document.getElementById('nrM').value,op:document.getElementById('nrO').value,val:+document.getElementById('nrV').value,sus:+document.getElementById('nrS').value,action,cd:20,builtin:false,cite:''});
     persistOrders(); renderOrders();
   };
 }
@@ -652,6 +761,8 @@ function tileState(k,v){
   if(k==='news2') return v>=7?'crit': v>=5?'warn':'';
   if(k==='borg') return v>=7?'crit': v>=5?'warn':'';
   if(k==='temp') return v>=38.5?'warn':'';
+  if(k==='sbp') return (v>=180||v<=90)?'crit': (v>=160||v<=100)?'warn':'';
+  if(k==='wt') return v>=3?'crit': v>=2?'warn':'';
   return '';
 }
 function spark(k){
@@ -663,9 +774,11 @@ function spark(k){
 function renderTiles(){
   const v=S.vit;
   el.tiles.innerHTML=TILES.map(k=>{
-    const meta=MMETA[k], val=(+v[k]).toFixed(meta.dec);
-    const sub = k==='spo2' ? (S.o2>0? t('onO2')+' '+S.o2+' '+t('o2flowU') : t('air')) : '';
-    return '<div class="tile '+tileState(k,v[k])+'"><div class="lbl">'+t('v'+({spo2:'Spo2',hr:'Hr',rr:'Rr',sbp:'Sbp',temp:'Temp',borg:'Borg',news2:'News'})[k])+'</div>'
+    const meta=MMETA[k], val = k==='sbp' ? v.sbp+'/'+v.dbp : fmtV(k,v[k]);
+    const ld = LIVE.on ? liveFresh(k) : null;
+    const sub = ld ? t('srcWatch')+' · '+new Date(ld.ts).toTimeString().slice(0,5)
+              : k==='spo2' ? (S.o2>0? t('onO2')+' '+S.o2+' '+t('o2flowU') : t('air')) : '';
+    return '<div class="tile '+tileState(k,v[k])+'"><div class="lbl">'+t('v'+VLBL[k])+'</div>'
       +'<div class="val" dir="ltr">'+val+'<small> '+(meta.u?t(meta.u):'')+'</small></div>'
       +'<div class="sub">'+sub+'</div>'+spark(k)+'</div>';
   }).join('');
@@ -706,11 +819,11 @@ function entryNode(e){
   return div;
 }
 function reportBody(d){
-  const cells=['spo2','hr','rr','borg','temp','news2'].map(k=>{
-    const s=d.stats[k], meta=MMETA[k];
-    return '<div class="rep-cell"><div class="k">'+t('v'+({spo2:'Spo2',hr:'Hr',rr:'Rr',sbp:'Sbp',temp:'Temp',borg:'Borg',news2:'News'})[k])+'</div>'
-      +'<div class="v" dir="ltr">'+(+s.cur).toFixed(meta.dec)+' <span style="font-size:13px;color:var(--mut)">'+s.trend+'</span></div>'
-      +'<div class="r" dir="ltr">'+t('rRange')+' '+(+s.mn).toFixed(meta.dec)+'–'+(+s.mx).toFixed(meta.dec)+'</div></div>';
+  const cells=['spo2','hr','rr','sbp','borg','temp','wt','news2'].map(k=>{
+    const s=d.stats[k]; if(!s) return '';
+    return '<div class="rep-cell"><div class="k">'+t('v'+VLBL[k])+'</div>'
+      +'<div class="v" dir="ltr">'+fmtV(k,s.cur)+' <span style="font-size:13px;color:var(--mut)">'+s.trend+'</span></div>'
+      +'<div class="r" dir="ltr">'+t('rRange')+' '+fmtV(k,s.mn)+'–'+fmtV(k,s.mx)+'</div></div>';
   }).join('');
   const [zc,zk]=ZC[d.zone];
   const ther = d.therapies.length
@@ -744,6 +857,7 @@ function renderAll(){
   const rem=repInterval-(S.minute-S.lastReport);
   el.nextRep.textContent = rem>0 ? rem+' '+t('minW') : '…';
   el.o2now.textContent=S.o2+' '+t('o2flowU');
+  renderLiveStatus();
 }
 
 /* ================= audio ================= */
@@ -755,6 +869,7 @@ function beep(n){ if(!AC) return; for(let i=0;i<n;i++){ const o=AC.createOscilla
 /* ================= controls ================= */
 el.playBtn.onclick=()=>{ S.running=!S.running; el.playBtn.textContent=S.running?t('pause'):t('play'); };
 el.resetBtn.onclick=()=>reset(S.scen);
+el.liveBtn.onclick=toggleLive;
 el.langBtn.onclick=()=>{ L=L==='en'?'ar':'en'; try{localStorage.setItem('riati_lang',L);}catch(e){} renderStatic(); };
 el.ackBtn.onclick=()=>{ if(S.alarm){ S.alarm=null; el.alarmbar.classList.remove('show'); log('ai',()=>t('eAck')); } };
 el.repNowBtn.onclick=()=>{ sendReport(S.minute,false); renderAll(); };

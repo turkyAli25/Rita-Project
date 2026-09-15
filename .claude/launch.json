@@ -2,9 +2,9 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "riati-static",
+      "name": "riati-bridge",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "8734"],
+      "runtimeArgs": ["watch_bridge.py", "8734"],
       "port": 8734
     }
   ]
