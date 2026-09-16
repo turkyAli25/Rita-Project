@@ -40,6 +40,7 @@ input:focus{outline:2px solid #4F2D57;outline-offset:1px}
     </a>
     <div style="display:flex;gap:22px;margin-inline-start:auto;font-size:14px;color:#4F2D57;flex-wrap:wrap">
       <a href="demo.html" style="color:#B8892E;font-weight:600">{{ t.navDemo }}</a>
+      <a href="#serve" style="color:#4F2D57">{{ t.navServe }}</a>
       <a href="#steps" style="color:#4F2D57">{{ t.navSteps }}</a>
       <a href="#problem" style="color:#4F2D57">{{ t.navProblem }}</a>
       <a href="#solution" style="color:#4F2D57">{{ t.navSolution }}</a>
@@ -97,6 +98,35 @@ input:focus{outline:2px solid #4F2D57;outline-offset:1px}
     <span>{{ t.m1 }}</span><span style="color:#B8892E">◆</span><span>{{ t.m2 }}</span><span style="color:#B8892E">◆</span><span>{{ t.m3 }}</span><span style="color:#B8892E">◆</span><span>{{ t.m4 }}</span><span style="color:#B8892E">◆</span>
   </div>
 </div>
+
+<!-- WHO WE SERVE -->
+<section id="serve" style="max-width:1180px;margin:0 auto;padding:96px 24px 0">
+  <div data-reveal="" style="max-width:760px;margin-bottom:36px">
+    <p style="margin:0 0 14px;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:#B8892E;font-weight:600">{{ t.serveKicker }}</p>
+    <h2 style="margin:0 0 16px;font-family:'Newsreader','Amiri',serif;font-weight:400;font-size:clamp(32px,4vw,48px);line-height:1.1;letter-spacing:-.015em;color:#2E1834;text-wrap:balance">{{ t.serveTitle }}</h2>
+    <p style="margin:0;font-size:16px;line-height:1.6;color:#4A3B4E;text-wrap:pretty">{{ t.serveBody }}</p>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px">
+    <sc-for list="{{ serves }}" as="sv" hint-placeholder-count="3">
+      <div data-reveal="" style="background:#fff;border:1px solid #E6DDE9;border-radius:20px;padding:28px;transition-delay:{{ sv.delay }};display:flex;flex-direction:column;gap:10px">
+        <div style="font-family:'Newsreader',serif;font-size:40px;color:#D9CCE3;line-height:1">{{ sv.n }}</div>
+        <h3 style="margin:0;font-size:21px;font-weight:600;color:#2E1834">{{ sv.title }}</h3>
+        <p style="margin:0;font-size:15px;line-height:1.6;color:#4A3B4E;text-wrap:pretty">{{ sv.body }}</p>
+        <div style="margin-top:auto;padding-top:10px;font-size:12px;color:#6B5C70;letter-spacing:.06em;text-transform:uppercase;font-weight:600">{{ sv.tag }}</div>
+      </div>
+    </sc-for>
+  </div>
+  <div data-reveal="" style="margin-top:20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px">
+    <div style="border:1px dashed #B8892E;border-radius:20px;padding:22px 26px">
+      <div style="font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:#B8892E;font-weight:600;margin-bottom:6px">{{ t.serveScopeK }}</div>
+      <div style="font-size:15px;line-height:1.6;color:#2E1834;text-wrap:pretty">{{ t.serveScope }}</div>
+    </div>
+    <div style="background:#fff;border:1px solid #E6DDE9;border-radius:20px;padding:22px 26px">
+      <div style="font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:#6B5C70;font-weight:600;margin-bottom:6px">{{ t.serveAroundK }}</div>
+      <div style="font-size:15px;line-height:1.6;color:#4A3B4E;text-wrap:pretty">{{ t.serveAround }}</div>
+    </div>
+  </div>
+</section>
 
 <!-- STEPS -->
 <section id="steps" style="max-width:1180px;margin:0 auto;padding:96px 24px 0">
@@ -376,7 +406,7 @@ class Component extends DCLogic {
   }
   T() {
     const en = {
-      langSwitch: 'العربية', navDemo: 'Live clinical demo', clinicalDemo: 'Watch the AI monitor live', spo2Short: 'SpO₂', pefShort: 'PEF', lmin: ' L/min', pct: '%', cardSpo2: '96', cardSteps: '4,820', cardPef: '410', cardSym: '1', of5: '/5', stat1n: '4', stat2n: '7·30·90', navProblem: 'Problem', navSolution: 'Solution', navTrends: 'Trends', navPlan: 'Action plan', navRoadmap: 'Roadmap', navFaqs: 'FAQs', myProgress: 'My progress', createAccount: 'Create account', signIn: 'Sign in', signOut: 'Sign out',
+      langSwitch: 'العربية', navDemo: 'Live clinical demo', clinicalDemo: 'Watch the AI monitor live', spo2Short: 'SpO₂', pefShort: 'PEF', lmin: ' L/min', pct: '%', cardSpo2: '96', cardSteps: '4,820', cardPef: '410', cardSym: '1', of5: '/5', stat1n: '4', stat2n: '7·30·90', navServe: 'Who we serve', serveKicker: 'Who we serve', serveTitle: 'People living with a chronic lung disease, and the people around them.', serveBody: 'Riati is built for adults whose lungs need watching every day, not only on clinic days. Each condition has its own early-warning signals, and the platform is set up to follow exactly those.', serveScopeK: 'Phase one', serveScope: 'Participation is within a study approved by a research ethics committee. Phase one starts with one clinic and one disease pathway, then widens to further pathways and clinics.', serveAroundK: 'Around the patient', serveAround: 'A family member can record on the patient’s behalf with recorded consent, and the clinical and research team see the whole cohort on one screen.', navProblem: 'Problem', navSolution: 'Solution', navTrends: 'Trends', navPlan: 'Action plan', navRoadmap: 'Roadmap', navFaqs: 'FAQs', myProgress: 'My progress', createAccount: 'Create account', signIn: 'Sign in', signOut: 'Sign out',
       accountLink: 'Create account / sign in', heroKicker: 'Respiratory health · Home follow-up', heroTitle: 'Chronic lung disease is continuous. Care should not be intermittent.', heroBody: 'Riati lets patients record oxygen saturation, home breathing tests, steps and symptoms every day, then classifies each reading against clinician-set rules so the care team sees who needs attention before a crisis.', heroCta: 'Try the demo', heroCta2: 'See the trends', stat1: 'daily measures', stat2: 'day trend windows', stat3n: 'AR / EN', stat3: 'built in Arabic first',
       cardToday: 'Today', cardTitle: 'Daily check-in', zoneGreen: 'Green · Routine care', steps: 'Steps', symptoms: 'Symptoms', last14: 'last 14 days', cardNote: 'Rules are published and adjustable. No opaque algorithm.',
       m1: 'Designed in Arabic from the ground up', m2: 'Transparent clinical rules', m3: 'Research-grade governance from day one', m4: 'Live at raitie.com',
@@ -393,7 +423,7 @@ class Component extends DCLogic {
       navSteps: 'How it works', tryDemo: 'Try the demo', heroDemoNote: 'No account needed. Start as a guest, enter your readings, and create an account later to keep them.', guest: 'Guest', exitDemo: 'Exit demo', saveProgress: 'Save my progress', baselineTitle: 'Step 1 · Set your baseline', baselineBody: 'Enter today\u2019s readings. Your first entries become the personal baseline that later readings are compared with.', baselineForm: 'Your baseline', stepsTitle: 'Three clear steps', recordKicker: 'What you log daily', recordTitle: 'What can you record?', welcome: 'Welcome back, ', streak: 'check-ins saved', incomplete: 'Assessment incomplete', zGreen: 'Green', zAmber: 'Amber', zRed: 'Red', msgGreen: 'Follow your daily plan. Your readings meet your agreed criteria.', msgAmber: 'Follow your signed instructions and contact your named service within the stated time.', msgRed: 'Follow your approved emergency instructions now. In Saudi Arabia call 997. Do not wait for a clinic reply.', msgInc: 'Enter an SpO₂ reading to complete today\u2019s assessment. Incomplete never means green.', lastSpo2: 'Last SpO₂', avg7: '7-day avg SpO₂', below90: 'Readings under 90%', errExists: 'An account with this email already exists. Sign in instead.', errNo: 'No account found for this email.', errPass: 'Incorrect password.', days: 'days'
     };
     const ar = {
-      langSwitch: 'English', navDemo: 'العرض السريري المباشر', clinicalDemo: 'شاهد المراقب الذكي مباشرة', spo2Short: 'نسبة الأكسجين', pefShort: 'ذروة التدفق', lmin: ' لتر/د', pct: '٪', cardSpo2: '٩٦', cardSteps: '٤٬٨٢٠', cardPef: '٤١٠', cardSym: '١', of5: '/٥', stat1n: '٤', stat2n: '٧·٣٠·٩٠', navProblem: 'المشكلة', navSolution: 'الحل', navTrends: 'الاتجاهات', navPlan: 'خطة العمل', navRoadmap: 'خريطة الطريق', navFaqs: 'الأسئلة الشائعة', myProgress: 'تقدمي', createAccount: 'إنشاء حساب', signIn: 'تسجيل الدخول', signOut: 'تسجيل الخروج',
+      langSwitch: 'English', navDemo: 'العرض السريري المباشر', clinicalDemo: 'شاهد المراقب الذكي مباشرة', spo2Short: 'نسبة الأكسجين', pefShort: 'ذروة التدفق', lmin: ' لتر/د', pct: '٪', cardSpo2: '٩٦', cardSteps: '٤٬٨٢٠', cardPef: '٤١٠', cardSym: '١', of5: '/٥', stat1n: '٤', stat2n: '٧·٣٠·٩٠', navServe: 'من نخدم', serveKicker: 'من نخدم', serveTitle: 'أصحاب الأمراض الرئوية المزمنة، ومن حولهم.', serveBody: 'صُممت «رئتي» للبالغين الذين تحتاج رئاتهم إلى متابعة كل يوم، لا في أيام العيادة فقط. لكل حالة إشاراتها المبكرة، والمنصة مهيّأة لمتابعة هذه الإشارات تحديدًا.', serveScopeK: 'المرحلة الأولى', serveScope: 'المشاركة ضمن دراسة معتمدة من لجنة أخلاقيات البحث. تبدأ المرحلة الأولى بعيادة واحدة ومسار مرضي واحد، ثم تتسع إلى مسارات وعيادات أخرى.', serveAroundK: 'حول المريض', serveAround: 'يمكن لأحد أفراد الأسرة التسجيل نيابةً عن المريض بموافقة مسجّلة، ويرى الفريق السريري والبحثي المجموعة كاملة في شاشة واحدة.', navProblem: 'المشكلة', navSolution: 'الحل', navTrends: 'الاتجاهات', navPlan: 'خطة العمل', navRoadmap: 'خريطة الطريق', navFaqs: 'الأسئلة الشائعة', myProgress: 'تقدمي', createAccount: 'إنشاء حساب', signIn: 'تسجيل الدخول', signOut: 'تسجيل الخروج',
       accountLink: 'إنشاء حساب / دخول', heroKicker: 'صحة الجهاز التنفسي, متابعة منزلية', heroTitle: 'الأمراض التنفسية المزمنة مستمرة، فلماذا تكون الرعاية متقطعة؟', heroBody: 'تتيح «رئتي» للمريض تسجيل التشبع بالأكسجين وفحص التنفس المنزلي والخطوات والأعراض يوميًا، ثم تصنّف كل قراءة وفق قواعد سريرية معلنة ليرى الفريق من يحتاج إلى العناية قبل الأزمة.', heroCta: 'جرّب المنصة', heroCta2: 'شاهد الاتجاهات', stat1: 'قياسات يومية', stat2: 'نوافذ الاتجاه بالأيام', stat3n: 'عربي / EN', stat3: 'صُممت بالعربية من الأساس',
       cardToday: 'اليوم', cardTitle: 'التسجيل اليومي', zoneGreen: 'أخضر · رعاية روتينية', steps: 'الخطوات', symptoms: 'الأعراض', last14: 'آخر ١٤ يومًا', cardNote: 'قواعد معلنة وقابلة للتعديل، لا خوارزمية مبهمة.',
       m1: 'صُممت بالعربية من الأساس', m2: 'قواعد سريرية شفافة', m3: 'حوكمة بمعايير البحث العلمي منذ اليوم الأول', m4: 'تعمل الآن على raitie.com',
@@ -461,7 +491,12 @@ class Component extends DCLogic {
         { unit: 'حجم الزفير · ذروة التدفق', title: 'اختبار التنفس المنزلي', body: 'انسخ من جهازك أو تقريرك كمية الهواء في أول ثانية أو ذروة التدفق.', note: 'مقارنة بخط أساسك' },
         { unit: 'خطوات', title: 'النشاط والخطوات', body: 'أضف عدد خطواتك اليومية. يُدخل العدد يدويًا؛ ونقل الخطوات تلقائيًا من الساعة في المرحلة التالية.', note: 'يدويًا حاليًا' }
       ],
-      metrics: [['spo2', 'SpO₂'], ['pef', 'PEF'], ['steps', 'الخطوات'], ['sym', 'الأعراض']]
+      metrics: [['spo2', 'SpO₂'], ['pef', 'PEF'], ['steps', 'الخطوات'], ['sym', 'الأعراض']],
+      serves: [
+        { title: 'الربو', body: 'البالغون المصابون بالربو ممن تتقلب سيطرتهم عليه يومًا بيوم؛ استخدام البخاخ المُسعف وأعراض الليل وذروة التدفق تحكي القصة قبل موعد الزيارة.', tag: 'ذروة التدفق · الأعراض · البخاخ المُسعف' },
+        { title: 'الانسداد الرئوي المزمن', body: 'المصابون بالانسداد الرئوي المزمن، حيث يكون هبوط نسبة الأكسجين وتزايد ضيق النفس في المنزل أول علامات النوبة.', tag: 'نسبة الأكسجين · ضيق النفس · الخطوات' },
+        { title: 'التليف الرئوي', body: 'المصابون بأمراض الرئة الخلالية، حيث تحتاج نسبة الأكسجين أثناء الراحة والمشي والانحدار البطيء في نتائج فحص التنفس إلى متابعة على مدى أشهر.', tag: 'الأكسجين في الراحة والجهد · السعة الحيوية' }
+      ]
     } : {
       problems: [
         { title: 'A few visits a year, continuous decline', body: 'A person with asthma, COPD or pulmonary fibrosis sees their clinic a handful of times a year, while oxygen saturation and lung function begin to fall at home.' },
@@ -511,7 +546,12 @@ class Component extends DCLogic {
         { unit: 'FEV1 · PEF', title: 'Home breathing test', body: 'Copy the first-second volume or peak flow from your device or report.', note: 'Compared with your baseline' },
         { unit: 'Steps', title: 'Activity and steps', body: 'Add your daily step count. Entered manually today; automatic sync from a watch comes in the next phase.', note: 'Manual for now' }
       ],
-      metrics: [['spo2', 'SpO₂'], ['pef', 'PEF'], ['steps', 'Steps'], ['sym', 'Symptoms']]
+      metrics: [['spo2', 'SpO₂'], ['pef', 'PEF'], ['steps', 'Steps'], ['sym', 'Symptoms']],
+      serves: [
+        { title: 'Asthma', body: 'Adults with asthma whose control varies from day to day. Reliever use, night symptoms and peak flow tell the story long before the next appointment does.', tag: 'Peak flow · symptoms · reliever use' },
+        { title: 'COPD', body: 'People with chronic obstructive pulmonary disease, where a falling oxygen level and rising breathlessness at home are the earliest signs of an exacerbation.', tag: 'SpO₂ · breathlessness · steps' },
+        { title: 'Pulmonary fibrosis', body: 'People with interstitial lung disease, where oxygen at rest and on walking, and a slow drift in breathing-test results, need to be followed over months.', tag: 'SpO₂ at rest and on exertion · FVC' }
+      ]
     };
   }
   renderVals() {
@@ -533,6 +573,7 @@ class Component extends DCLogic {
       ],
       problems: c.problems.map((p, i) => ({ ...p, n: this.nd(String(i + 1).padStart(2, '0')), delay: delay(i) })),
       measures: c.measures, zones: c.zones,
+      serves: c.serves.map((x, i) => ({ ...x, n: this.nd(String(i + 1).padStart(2, '0')), delay: delay(i) })),
       steps: c.steps.map((x, i) => ({ ...x, n: this.nd(i + 1), delay: delay(i) })), records: c.records.map((x, i) => ({ ...x, delay: delay(i) })),
       pillars: c.pillars.map((p, i) => ({ ...p, delay: delay(i) })),
       whys: c.whys.map((w, i) => ({ ...w, n: this.nd(String(i + 1).padStart(2, '0')) })),
