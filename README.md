@@ -106,6 +106,30 @@ Default thresholds derive from published guidance, cited in the page footer:
 NEWS2 is computed continuously in the background and surfaces only when it is elevated,
 so the monitor shows vital signs rather than a score.
 
+## Apple Watch simulator
+
+`watch-sim.html` (served by the pilot at `/watch-sim.html`) stands in for a real Apple
+Watch and its iPhone so the web side can be exercised before a watch is paired — and it
+uses exactly the path a real device does: it creates a patient account, asks Riati for a
+private upload key, optionally shares the record with a care-team code, and then posts
+readings to `POST /api/readings` with `Authorization: Bearer <key>` and original
+`measured_at` timestamps. Nothing on the server is special-cased for it.
+
+- **The watch** generates a resting heart rate that follows the time of day with
+  activity bursts, oxygen spot-checks every 30 minutes and hourly step counts. Scenarios:
+  normal day, exacerbation (oxygen drifting to 88%, heart rate up), night. Stream every
+  15 s to 5 min, send one reading, or backfill the last 6 hours (90 readings) at once.
+- **The phone side** creates the simulated patient and key with one click (kept in that
+  browser only), shares with the doctor's code, and can send check-ins ("more
+  breathless", "wheezing"…) to the care record. Sharing and check-ins sign the simulated
+  patient in and straight out again, so keep the doctor signed in on another browser or
+  the phone.
+
+Open it on the Mac at the pilot's secure address (`https://<mac-ip>:8750/watch-sim.html`)
+so the readings land in the same records the real portal shows. To run it against a
+scratch database instead: `python3 riati_server.py 8760 --data-dir work/sim-test` and open
+`http://127.0.0.1:8760/watch-sim.html`.
+
 ## Accounts, care views and real Apple Watch testing
 
 The approved action-explanation panel and patient/clinician views are implemented. The local account portal is at `/portal/`. Patient accounts control sharing; the care-team role requires a one-use invitation. Device uploads use revocable, account-specific keys, original measurement dates and duplicate detection. Real observations never enter the simulated medication engine.

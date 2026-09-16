@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Riati — Apple Watch simulator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Amiri:wght@400&display=swap" rel="stylesheet">
+<style>
+:root{--aub:#4F2D57;--aub-d:#2E1834;--cream:#FAF7F3;--lilac:#EDE6F2;--line:#E6DDE9;--gold:#B8892E;--ink:#1F1520;--mut:#6B5C70;--body:#4A3B4E;--green:#1F6F5B;--amber:#C9822B;--red:#A8323E}
+*{box-sizing:border-box}[hidden]{display:none!important}
+html,body{margin:0;background:var(--cream);color:var(--ink);-webkit-font-smoothing:antialiased}
+body{font-family:'IBM Plex Sans Arabic','Newsreader',system-ui,sans-serif;font-size:14px}
+input,select,button{font:inherit}
+.serif{font-family:'Newsreader','Amiri',serif;font-weight:400}
+.kicker{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-weight:600}
+.card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:22px}
+.btn{border:1px solid #D9CCE3;background:transparent;color:var(--aub);border-radius:999px;padding:9px 16px;font-size:13px;cursor:pointer}
+.btn:hover{background:var(--lilac)}.btn:disabled{opacity:.45;cursor:default}
+.btn-primary{background:var(--aub);color:var(--cream);border:0}.btn-primary:hover{background:var(--aub-d)}
+.btn-danger{background:var(--red);color:#fff;border:0}
+.in{border:1px solid #D9CCE3;border-radius:10px;padding:9px 12px;font-size:14px;background:var(--cream);color:var(--ink);width:100%}
+select.in{width:auto}
+.tiny{font-size:12px;color:var(--mut);line-height:1.55}
+header{border-top:3px dashed var(--gold);border-bottom:1px solid var(--line);background:rgba(250,247,243,.92)}
+.wrap{max-width:1180px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+main{max-width:1180px;margin:0 auto;padding:22px 20px 60px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:20px;align-items:start}
+@media(max-width:900px){main{grid-template-columns:1fr}}
+.watch{width:230px;height:280px;margin:6px auto 16px;background:#1B1420;border-radius:56px;padding:26px 22px;color:#fff;box-shadow:0 30px 60px -30px rgba(46,24,52,.7),inset 0 0 0 6px #2E1834;position:relative}
+.watch .time{font-size:13px;color:#C9B8D1;letter-spacing:.04em}
+.watch .hr{font-family:'Newsreader',serif;font-size:64px;line-height:1;margin-top:18px}
+.watch .hr small{font-size:16px;color:#C9B8D1}
+.watch .row{display:flex;justify-content:space-between;margin-top:22px;font-size:13px;color:#C9B8D1}
+.watch .row b{display:block;color:#fff;font-family:'Newsreader',serif;font-size:22px;font-weight:400}
+.watch .beat{position:absolute;top:26px;inset-inline-end:24px;width:10px;height:10px;border-radius:50%;background:var(--red);opacity:.4}
+.watch.live .beat{animation:beat 1s ease-in-out infinite}
+@keyframes beat{0%,100%{transform:scale(1);opacity:.45}50%{transform:scale(1.5);opacity:1}}
+.crown{position:absolute;inset-inline-end:-8px;top:70px;width:8px;height:34px;border-radius:4px;background:#3a2b40}
+.pill{display:inline-flex;align-items:center;gap:7px;border-radius:999px;padding:5px 12px;font-size:12px;font-weight:600}
+.pill.ok{background:#E6F2EE;color:var(--green)}.pill.no{background:var(--lilac);color:var(--aub)}.pill.err{background:#FDF4F5;color:var(--red)}
+.log{display:flex;flex-direction:column;gap:6px;max-height:320px;overflow-y:auto;margin-top:10px}
+.log div{font-size:12.5px;padding:8px 10px;border-radius:10px;background:var(--cream);border:1px solid var(--line);color:var(--body);display:flex;gap:10px}
+.log div.err{border-color:var(--red);background:#FDF4F5}.log div .t{color:var(--mut);flex:none}
+.field{display:flex;flex-direction:column;gap:6px;margin-top:12px;font-size:13px;color:var(--mut)}
+.row2{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.code{font:13px ui-monospace,Menlo,monospace;background:var(--cream);border:1px solid var(--line);border-radius:8px;padding:6px 9px;overflow-wrap:anywhere}
+h2{margin:0 0 4px;font-family:'Newsreader','Amiri',serif;font-weight:400;font-size:22px;color:var(--aub-d)}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <a href="/" style="display:flex;align-items:center;gap:9px;text-decoration:none"><img src="/assets/logo.png" alt="" style="width:34px;height:34px;object-fit:contain"><span class="serif" style="font-size:19px;color:var(--aub)">Riati <span style="color:var(--gold);font-weight:300">|</span> <span style="font-family:'Amiri',serif">رئتي</span></span></a>
+  <span class="kicker" id="hSub"></span>
+  <div style="margin-inline-start:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+    <a class="btn" href="/portal/" id="portalLink"></a>
+    <button class="btn" id="langBtn"></button>
+  </div>
+</div></header>
+
+<main>
+  <!-- the watch -->
+  <section class="card">
+    <h2 id="kWatch"></h2>
+    <p class="tiny" id="watchNote" style="margin:0 0 8px"></p>
+    <div class="watch" id="watch"><div class="beat"></div><div class="crown"></div>
+      <div class="time" id="wTime">--:--</div>
+      <div class="hr"><span id="wHr">--</span> <small>bpm</small></div>
+      <div class="row"><div><span id="lSpo2"></span><b id="wSpo2">--</b></div><div><span id="lSteps"></span><b id="wSteps">0</b></div></div>
+    </div>
+    <div class="field"><span id="lScen"></span><select class="in" id="scen"><option value="normal"></option><option value="exac"></option><option value="night"></option></select></div>
+    <div class="field"><span id="lEvery"></span><select class="in" id="every"><option value="15"></option><option value="30" selected></option><option value="60"></option><option value="300"></option></select></div>
+    <div class="row2" style="margin-top:14px">
+      <button class="btn btn-primary" id="startBtn"></button>
+      <button class="btn" id="onceBtn"></button>
+      <button class="btn" id="backBtn"></button>
+    </div>
+    <div class="tiny" id="streamNote" style="margin-top:10px"></div>
+  </section>
+
+  <!-- the phone side: account, key, sharing, uploads -->
+  <section class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+      <h2 id="kSetup"></h2><span class="pill no" id="status"></span>
+    </div>
+    <p class="tiny" id="setupNote" style="margin:4px 0 0"></p>
+    <div id="setupForm">
+      <div class="field"><span id="lName"></span><input class="in" id="name"></div>
+      <div class="field"><span id="lCode"></span><input class="in" id="code" placeholder="AB12CD34EF" style="direction:ltr;text-transform:uppercase"></div>
+      <div class="row2" style="margin-top:14px"><button class="btn btn-primary" id="createBtn"></button></div>
+    </div>
+    <div id="ready" hidden>
+      <div class="field"><span id="lPatient"></span><div class="code" id="pName"></div></div>
+      <div class="field"><span id="lEndpoint"></span><div class="code" id="endpoint" dir="ltr"></div></div>
+      <div class="field"><span id="lKey"></span><div class="code" id="keyMasked" dir="ltr"></div></div>
+      <div class="field"><span id="lCode2"></span><div class="row2"><input class="in" id="code2" placeholder="AB12CD34EF" style="direction:ltr;text-transform:uppercase;max-width:220px"><button class="btn" id="shareBtn"></button></div><span class="tiny" id="shareNote"></span></div>
+      <div class="field"><span id="lCheckin"></span><div class="row2"><select class="in" id="feeling"><option value="breathless"></option><option value="wheezing"></option><option value="well"></option><option value="better"></option></select><button class="btn" id="checkinBtn"></button></div><span class="tiny" id="checkinNote"></span></div>
+      <div class="row2" style="margin-top:14px"><button class="btn" id="forgetBtn" style="font-size:12px"></button></div>
+    </div>
+    <h2 style="margin-top:22px;font-size:18px" id="kLog"></h2>
+    <div class="log" id="log"></div>
+  </section>
+</main>
+
+<script>
+'use strict';
+const T={
+en:{hSub:'Apple Watch simulator', portal:'Open the Riati portal', lang:'العربية',
+ kWatch:'The watch', watchNote:'Generates readings the way a real Apple Watch produces them: a resting heart rate that follows the time of day with activity bursts, oxygen spot-checks, and hourly step counts. Each reading is uploaded through the same private device API a real watch uses.',
+ lSpo2:'SpO₂', lSteps:'Steps today', lScen:'Scenario', scNormal:'Normal day', scExac:'Exacerbation — oxygen drifting down, heart rate up', scNight:'Night — low and steady',
+ lEvery:'Send a heart-rate reading every', e15:'15 seconds', e30:'30 seconds', e60:'minute', e300:'5 minutes',
+ start:'Start streaming', stop:'Stop', once:'Send one reading now', back:'Backfill the last 6 hours',
+ streamIdle:'Not streaming. Set up the simulated patient on the right, then press Start.', streaming:n=>`Streaming — ${n} readings sent this session. Oxygen every 30 min, steps every hour.`,
+ kSetup:'The phone side', setupNote:'This does what the iPhone does for a real patient: creates the patient account, asks Riati for a private upload key, and optionally shares the record with a care-team code. The key is kept in this browser only.',
+ lName:'Simulated patient name', lCode:'Care-team sharing code (optional — from the doctor’s Riati workspace)', create:'Create simulated patient and upload key',
+ sNo:'Not set up', sOk:'Ready — key stored', sErr:'Error',
+ lPatient:'Simulated patient', lEndpoint:'Upload address', lKey:'Private device key (masked)', lCode2:'Share the record with a care-team code', share:'Share', shareNote:'Sharing signs the simulated patient in briefly and then out again — if the doctor is signed in to Riati in this same browser, use another browser or the phone for the doctor.',
+ lCheckin:'Patient check-in (goes to the care record)', fBreathless:'More breathless', fWheezing:'Wheezing', fWell:'Feeling well', fBetter:'Breathing feels easier', checkin:'Send check-in', checkinNote:'Also signs the simulated patient in and out again.',
+ forget:'Forget this simulated patient in this browser', kLog:'Uploads',
+ lCreated:n=>`Simulated patient “${n}” created — private device key issued`, lShared:n=>`Record shared with ${n}`, lSent:(m,v,r)=>`${m} ${v} → ${r}`, lBack:n=>`Backfill: ${n} readings uploaded`, lCheck:'Check-in sent', lErr:e=>`Error: ${e}`, lForgot:'Simulated patient forgotten in this browser (the account still exists in Riati; delete it from the portal if needed)',
+ rStored:(s,d)=>`stored ${s}`+(d?`, duplicates ${d}`:''), name:'Watch Simulator'},
+ar:{hSub:'محاكي ساعة آبل', portal:'افتح بوابة رئتي', lang:'English',
+ kWatch:'الساعة', watchNote:'تولّد القراءات كما تنتجها ساعة آبل الحقيقية: نبض راحة يتبع وقت اليوم مع فترات نشاط، وقياسات أكسجين متفرقة، وعدد خطوات كل ساعة. تُرفع كل قراءة عبر واجهة الجهاز الخاصة نفسها التي تستخدمها الساعة الحقيقية.',
+ lSpo2:'الأكسجين', lSteps:'خطوات اليوم', lScen:'السيناريو', scNormal:'يوم اعتيادي', scExac:'نوبة — الأكسجين يهبط والنبض يرتفع', scNight:'ليل — منخفض ومستقر',
+ lEvery:'أرسل قراءة نبض كل', e15:'١٥ ثانية', e30:'٣٠ ثانية', e60:'دقيقة', e300:'٥ دقائق',
+ start:'ابدأ البث', stop:'إيقاف', once:'أرسل قراءة الآن', back:'املأ آخر ٦ ساعات',
+ streamIdle:'لا بث الآن. جهّز المريض الافتراضي في اليمين ثم اضغط ابدأ.', streaming:n=>`يبث — أُرسلت ${n} قراءة في هذه الجلسة. الأكسجين كل ٣٠ دقيقة، والخطوات كل ساعة.`,
+ kSetup:'جهة الهاتف', setupNote:'يفعل ما يفعله الآيفون للمريض الحقيقي: ينشئ حساب المريض، ويطلب من رئتي مفتاح رفع خاصًا، ويشارك السجل اختياريًا برمز فريق الرعاية. المفتاح يُحفظ في هذا المتصفح فقط.',
+ lName:'اسم المريض الافتراضي', lCode:'رمز مشاركة فريق الرعاية (اختياري — من مساحة عمل الطبيب في رئتي)', create:'أنشئ المريض الافتراضي ومفتاح الرفع',
+ sNo:'غير مجهّز', sOk:'جاهز — المفتاح محفوظ', sErr:'خطأ',
+ lPatient:'المريض الافتراضي', lEndpoint:'عنوان الرفع', lKey:'مفتاح الجهاز الخاص (مخفي)', lCode2:'شارك السجل برمز فريق الرعاية', share:'مشاركة', shareNote:'المشاركة تسجّل دخول المريض الافتراضي لحظة ثم تخرجه — إن كان الطبيب مسجّلًا في رئتي في هذا المتصفح نفسه فاستخدم متصفحًا آخر أو الهاتف للطبيب.',
+ lCheckin:'تسجيل حالة المريض (يذهب إلى سجل الرعاية)', fBreathless:'ضيق نفس أكثر', fWheezing:'صفير', fWell:'بخير', fBetter:'التنفس أسهل', checkin:'أرسل التسجيل', checkinNote:'يسجّل دخول المريض الافتراضي ثم يخرجه أيضًا.',
+ forget:'انسَ هذا المريض الافتراضي في هذا المتصفح', kLog:'الرفع',
+ lCreated:n=>`أُنشئ المريض الافتراضي «${n}» — وصدر مفتاح جهاز خاص`, lShared:n=>`شورك السجل مع ${n}`, lSent:(m,v,r)=>`${m} ${v} ← ${r}`, lBack:n=>`تعبئة: رُفعت ${n} قراءة`, lCheck:'أُرسل التسجيل', lErr:e=>`خطأ: ${e}`, lForgot:'نُسي المريض الافتراضي في هذا المتصفح (الحساب ما زال في رئتي؛ احذفه من البوابة إن لزم)',
+ rStored:(s,d)=>`خُزّن ${s}`+(d?`، مكرر ${d}`:''), name:'محاكي الساعة'}};
+let L='en'; try{ L=localStorage.getItem('riati_lang')==='ar'?'ar':'en'; }catch(e){}
+const t=k=>T[L][k];
+const KEY='riati_watch_sim_v1';
+let cfg={}; try{ cfg=JSON.parse(localStorage.getItem(KEY)||'{}')||{}; }catch(e){}
+const save=()=>{ try{ localStorage.setItem(KEY, JSON.stringify(cfg)); }catch(e){} };
+const $=id=>document.getElementById(id);
+const el={}; ['hSub','portalLink','langBtn','kWatch','watchNote','watch','wTime','wHr','wSpo2','wSteps','lSpo2','lSteps','lScen','scen','lEvery','every','startBtn','onceBtn','backBtn','streamNote','kSetup','status','setupNote','setupForm','lName','name','lCode','code','createBtn','ready','lPatient','pName','lEndpoint','endpoint','lKey','keyMasked','lCode2','code2','shareBtn','shareNote','lCheckin','feeling','checkinBtn','checkinNote','forgetBtn','kLog','log'].forEach(id=>el[id]=$(id));
+
+/* ---------- API (same calls the portal and a real device make) ---------- */
+const hdr=csrf=>({'Content-Type':'application/json','X-Riati-Request':'1',...(csrf?{'X-CSRF-Token':csrf}:{})});
+async function api(path, body, csrf){
+  const r=await fetch(path,{method:'POST',headers:hdr(csrf),body:JSON.stringify(body),credentials:'same-origin'});
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok) throw new Error(j.error||('HTTP '+r.status));
+  return j;
+}
+async function withSession(fn){  // sign the simulated patient in, do one thing, sign out again
+  const s=await api('/api/login',{email:cfg.email,password:cfg.password});
+  try{ return await fn(s.csrf); } finally { await api('/api/logout',{},s.csrf).catch(()=>{}); }
+}
+async function shareWith(csrf, code){
+  const p=await api('/api/share-preview',{code},csrf);
+  await api('/api/sharing',{code,consent:true,clinician_id:p.clinician.id},csrf);
+  log(t('lShared')(p.clinician.name));
+}
+async function setup(){
+  el.createBtn.disabled=true;
+  try{
+    const name=el.name.value.trim()||t('name');
+    const email='sim-'+Math.random().toString(36).slice(2,10)+'@riati.local';
+    const password='Sim-'+crypto.randomUUID();
+    const s=await api('/api/signup',{name,email,password,consent:true});
+    const d=await api('/api/device-tokens',{label:'Apple Watch simulator'},s.csrf);
+    cfg={name,email,password,token:d.token,endpoint:d.endpoint,patientId:s.user.id,created:Date.now()}; save();
+    log(t('lCreated')(name));
+    const code=el.code.value.trim().replace(/\s/g,'').toUpperCase();
+    if(code){ try{ await shareWith(s.csrf,code); }catch(e){ log(t('lErr')(e.message),true); } }
+    await api('/api/logout',{},s.csrf).catch(()=>{});
+  }catch(e){ log(t('lErr')(e.message),true); setStatus('err'); }
+  el.createBtn.disabled=false; render();
+}
+async function send(readings){
+  // a real device posts to cfg.endpoint; a browser page must stay on its own origin, so post to the same server this page came from
+  const r=await fetch('/api/readings',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+cfg.token},body:JSON.stringify({readings})});
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok) throw new Error(j.error||('HTTP '+r.status));
+  return j;
+}
+
+/* ---------- the simulated watch ---------- */
+const sim={hr:70, spo2:97, steps:0, burstUntil:0, burstAmp:0, start:Date.now(), lastSpo2:0, lastSteps:0, sent:0};
+const scen=()=>el.scen.value;
+function nextHR(now){
+  const h=now.getHours()+now.getMinutes()/60;
+  let base = h<6?58 : h<9?68 : h<18?72 : h<22?66 : 60;
+  if(scen()==='exac') base+=22; if(scen()==='night') base=56;
+  if(scen()!=='night' && now.getTime()>sim.burstUntil && Math.random()<0.03){ sim.burstUntil=now.getTime()+(3+Math.random()*5)*60000; sim.burstAmp=25+Math.random()*20; }
+  const burst = now.getTime()<sim.burstUntil ? sim.burstAmp : 0;
+  sim.hr = Math.round(sim.hr + (base+burst-sim.hr)*0.4 + (Math.random()-0.5)*6);
+  return Math.max(40, Math.min(190, sim.hr));
+}
+function nextSpO2(now){
+  const target = scen()==='exac' ? Math.max(88, 94-(now.getTime()-sim.start)/3600000*3) : scen()==='night' ? 94 : 97;
+  sim.spo2 = Math.round(sim.spo2 + (target-sim.spo2)*0.5 + (Math.random()-0.5)*1.4);
+  return Math.max(80, Math.min(100, sim.spo2));
+}
+function hourlySteps(now){ const h=now.getHours(); const base = h<6?0 : h<9?400 : h<18?600 : h<22?300 : 50; return Math.round(base*(0.5+Math.random())*(scen()==='exac'?0.4:1)); }
+const src='Apple Watch simulator';
+function batchAt(now, force){
+  const out=[{metric:'hr', value:nextHR(now), measured_at:now.toISOString(), source:src}];
+  if(force || now.getTime()-sim.lastSpo2 >= 30*60000){ sim.lastSpo2=now.getTime(); out.push({metric:'spo2', value:nextSpO2(now), measured_at:now.toISOString(), source:src}); }
+  if(force || now.getTime()-sim.lastSteps >= 60*60000){ sim.lastSteps=now.getTime(); const st=hourlySteps(now); sim.steps+=st; out.push({metric:'steps', value:st, measured_at:now.toISOString(), source:src}); }
+  return out;
+}
+async function tick(force){
+  if(!cfg.token) return;
+  const now=new Date(); const b=batchAt(now, force);
+  try{ const r=await send(b); sim.sent+=b.length; b.forEach(x=>log(t('lSent')(x.metric.toUpperCase(), x.value, t('rStored')(r.stored, r.duplicates)))); }
+  catch(e){ log(t('lErr')(e.message),true); }
+  renderWatch();
+}
+let timer=null;
+function startStop(){
+  if(timer){ clearInterval(timer); timer=null; el.watch.classList.remove('live'); }
+  else { tick(true); timer=setInterval(()=>tick(false), +el.every.value*1000); el.watch.classList.add('live'); }
+  render();
+}
+async function backfill(){
+  if(!cfg.token) return;
+  el.backBtn.disabled=true;
+  const now=Date.now(); const all=[];
+  for(let i=72;i>=1;i--){ const d=new Date(now-i*5*60000); all.push({metric:'hr',value:nextHR(d),measured_at:d.toISOString(),source:src});
+    if(i%6===0) all.push({metric:'spo2',value:nextSpO2(d),measured_at:d.toISOString(),source:src});
+    if(i%12===0) all.push({metric:'steps',value:hourlySteps(d),measured_at:d.toISOString(),source:src}); }
+  let n=0;
+  try{ for(let i=0;i<all.length;i+=50){ const r=await send(all.slice(i,i+50)); n+=r.stored; await new Promise(res=>setTimeout(res,400)); } log(t('lBack')(n)); }
+  catch(e){ log(t('lErr')(e.message),true); }
+  el.backBtn.disabled=false; renderWatch();
+}
+
+/* ---------- rendering ---------- */
+const AD='٠١٢٣٤٥٦٧٨٩'; const N=s=>L==='ar'?String(s).replace(/[0-9]/g,d=>AD[d]):String(s);
+const logs=[];
+function log(text, err){ logs.push({time:new Date(), text, err:!!err}); if(logs.length>60) logs.shift(); renderLog(); }
+function renderLog(){ el.log.innerHTML=logs.slice().reverse().map(x=>'<div class="'+(x.err?'err':'')+'"><span class="t" dir="ltr">'+N(x.time.toTimeString().slice(0,8))+'</span><span>'+esc(N(x.text))+'</span></div>').join(''); }
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function setStatus(k){ el.status.className='pill '+(k==='ok'?'ok':k==='err'?'err':'no'); el.status.textContent=t(k==='ok'?'sOk':k==='err'?'sErr':'sNo'); }
+function renderWatch(){
+  const now=new Date(); el.wTime.textContent=N(now.toTimeString().slice(0,5));
+  el.wHr.textContent=N(sim.hr); el.wSpo2.textContent=N(sim.spo2)+'%'; el.wSteps.textContent=N(sim.steps.toLocaleString('en-US'));
+  el.streamNote.textContent = timer ? t('streaming')(N(sim.sent)) : t('streamIdle');
+}
+function render(){
+  document.documentElement.lang=L; document.documentElement.dir=L==='ar'?'rtl':'ltr';
+  document.title = L==='ar'?'رئتي — محاكي ساعة آبل':'Riati — Apple Watch simulator';
+  el.hSub.textContent=t('hSub'); el.portalLink.textContent=t('portal'); el.langBtn.textContent=t('lang');
+  el.kWatch.textContent=t('kWatch'); el.watchNote.textContent=t('watchNote'); el.lSpo2.textContent=t('lSpo2'); el.lSteps.textContent=t('lSteps');
+  el.lScen.textContent=t('lScen'); [...el.scen.options].forEach(o=>o.textContent=t({normal:'scNormal',exac:'scExac',night:'scNight'}[o.value]));
+  el.lEvery.textContent=t('lEvery'); [...el.every.options].forEach(o=>o.textContent=t('e'+o.value));
+  el.startBtn.textContent=timer?t('stop'):t('start'); el.onceBtn.textContent=t('once'); el.backBtn.textContent=t('back');
+  el.kSetup.textContent=t('kSetup'); el.setupNote.textContent=t('setupNote'); el.lName.textContent=t('lName'); el.lCode.textContent=t('lCode'); el.createBtn.textContent=t('create');
+  el.lPatient.textContent=t('lPatient'); el.lEndpoint.textContent=t('lEndpoint'); el.lKey.textContent=t('lKey'); el.lCode2.textContent=t('lCode2'); el.shareBtn.textContent=t('share'); el.shareNote.textContent=t('shareNote');
+  el.lCheckin.textContent=t('lCheckin'); [...el.feeling.options].forEach(o=>o.textContent=t({breathless:'fBreathless',wheezing:'fWheezing',well:'fWell',better:'fBetter'}[o.value])); el.checkinBtn.textContent=t('checkin'); el.checkinNote.textContent=t('checkinNote');
+  el.forgetBtn.textContent=t('forget'); el.kLog.textContent=t('kLog');
+  const ready=!!cfg.token;
+  el.setupForm.hidden=ready; el.ready.hidden=!ready; setStatus(ready?'ok':'no');
+  if(ready){ el.pName.textContent=cfg.name; el.endpoint.textContent=cfg.endpoint; el.keyMasked.textContent=cfg.token.slice(0,6)+'…'+cfg.token.slice(-4); }
+  el.startBtn.disabled=!ready; el.onceBtn.disabled=!ready; el.backBtn.disabled=!ready;
+  renderWatch(); renderLog();
+}
+
+/* ---------- controls ---------- */
+el.langBtn.onclick=()=>{ L=L==='en'?'ar':'en'; try{localStorage.setItem('riati_lang',L);}catch(e){} render(); };
+el.createBtn.onclick=setup;
+el.startBtn.onclick=startStop;
+el.onceBtn.onclick=()=>tick(true);
+el.backBtn.onclick=backfill;
+el.shareBtn.onclick=async()=>{ const code=el.code2.value.trim().replace(/\s/g,'').toUpperCase(); if(!code) return; el.shareBtn.disabled=true; try{ await withSession(csrf=>shareWith(csrf,code)); }catch(e){ log(t('lErr')(e.message),true); } el.shareBtn.disabled=false; };
+el.checkinBtn.onclick=async()=>{ el.checkinBtn.disabled=true; try{ await withSession(csrf=>api('/api/checkins',{feeling:el.feeling.value,note:''},csrf)); log(t('lCheck')); }catch(e){ log(t('lErr')(e.message),true); } el.checkinBtn.disabled=false; };
+el.forgetBtn.onclick=()=>{ if(timer) startStop(); cfg={}; try{localStorage.removeItem(KEY);}catch(e){} log(t('lForgot')); render(); };
+setInterval(renderWatch, 1000);
+render();
+</script>
+</body>
+</html>
