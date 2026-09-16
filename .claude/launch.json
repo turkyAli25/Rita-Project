@@ -1,11 +1,4 @@
 {
   "version": "0.0.1",
-  "configurations": [
-    {
-      "name": "riati-bridge",
-      "runtimeExecutable": "python3",
-      "runtimeArgs": ["watch_bridge.py", "8734"],
-      "port": 8734
-    }
-  ]
+  "configurations": [{"name":"riati-accounts-local","runtimeExecutable":"python3","runtimeArgs":["watch_bridge.py","8740"],"port":8740}]
 }

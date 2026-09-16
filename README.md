@@ -56,6 +56,41 @@ the respiratory ones (β-blocker at 60 min, diuretic at 6 h, amlodipine at 4 h).
 "Cardiac day" scenario exercises the whole set: a sustained tachycardia, fluid gain
 through the day, a hypertensive spike and a later post-diuresis dip.
 
+### Patient journal, keyword orders and voice
+
+The patient has a journal: they type how they feel, or record a voice note (transcribed
+with the browser's speech recognition), and the simulated patient also writes on its own
+when something changes — "I am wheezing and can't catch my breath", "feeling weak and
+shaky", "I feel better now".
+
+Every entry is matched against the physician's **symptom keyword orders** (editable list,
+Arabic and English words, loose matching that ignores diacritics and alef/ta-marbuta
+variants). A match acts at once — the same interlocks and dose limits as any other order —
+and sends the patient the physician's instruction, read aloud when speech is on. Defaults:
+
+| Keywords | Action |
+| --- | --- |
+| dyspnea, short of breath, wheeze, ضيق نفس, صفير … | Salbutamol 2.5 mg neb + inhaler instruction |
+| chest pain, ألم في الصدر … | Emergency alarm, physician alerted, sit down / call 997 if it persists |
+| dizzy, shaky, sweating, دوخة, رجفة … | Check glucose now → 15-15 rule if under 70 mg/dL |
+| fever, chills, حرارة, قشعريرة … | Notify physician, paracetamol and fluids instruction |
+| better, improved, تحسنت … | Acknowledge, keep monitoring |
+
+The physician can also record a voice note and send it to the journal.
+
+### Blood glucose
+
+Glucose is a fingerstick, not a continuous stream. The patient checks it **with each report
+to the physician** (so every report carries a fresh reading), whenever symptoms suggest a
+low, 15 minutes after treating one, and 2-hourly during a steroid course. Between checks
+the tile shows the last reading and when the next is due, and the glucose orders act on
+each new reading rather than every minute. Defaults follow the ADA Standards of Care: a
+reading below 70 mg/dL → 15 g fast carbohydrate and recheck in 15 min (repeated if still
+low); below 54 → emergency alarm; two consecutive readings above 300 → notify with the
+sick-day plan (ketones, fluids, review steroid dose). The routine day includes one
+mid-morning low that the hourly check can miss — the patient's "shaky" message is what
+triggers the check, which is the point.
+
 ### Guideline basis
 
 Default thresholds derive from published guidance, cited in the page footer:
@@ -66,61 +101,38 @@ Default thresholds derive from published guidance, cited in the page footer:
 - **Cardioselective β-blockers in COPD** — safe and not to be withheld: [BICS trial](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC9009490/), [CHEST 2024 review](https://journal.chestnet.org/article/S0012-3692(24)04927-4/fulltext)
 - **ESC heart failure guidance** — weight gain > 2 kg in 3 days → increase diuretic per the patient's plan ([flexible diuretic regimens evidence check](https://aci.health.nsw.gov.au/__data/assets/pdf_file/0010/958483/ACI-Flexible-Diuretic-Regimens-Evidence-Check.pdf))
 - **[2025 AHA/ACC hypertension guideline](https://www.jacc.org/doi/10.1016/j.jacc.2025.07.010)** — BP > 180/120 without organ damage → intensify oral therapy as an outpatient, no acute lowering
+- **[ADA Standards of Care in Diabetes 2026, §6](https://diabetesjournals.org/care/article/49/Supplement_1/S132/163927/6-Glycemic-Goals-Hypoglycemia-and-Hyperglycemic)** — hypoglycaemia level 1 < 70 mg/dL, level 2 < 54 mg/dL; 15 g fast carbohydrate and recheck in 15 min; sick-day plan with ketone monitoring
 
 NEWS2 is computed continuously in the background and surfaces only when it is elevated,
 so the monitor shows vital signs rather than a score.
 
-## Testing with a real Apple Watch
+## Accounts, care views and real Apple Watch testing
 
-The demo can take live readings instead of simulated ones. Nothing is installed on the
-watch: readings already flow Watch → iPhone Health app. A Shortcut on the iPhone sends
-them to a small bridge on your Mac, and the demo page picks them up from there.
+The approved action-explanation panel and patient/clinician views are implemented. The local account portal is at `/portal/`. Patient accounts control sharing; the care-team role requires a one-use invitation. Device uploads use revocable, account-specific keys, original measurement dates and duplicate detection. Real observations never enter the simulated medication engine.
 
-1. **Start the bridge** (it also serves the site):
-   ```bash
-   python3 watch_bridge.py
-   ```
-   It prints your Mac's address, e.g. `http://192.168.1.20:8734`. Click *Allow* if macOS
-   asks about incoming connections. The iPhone and the Mac must be on the same Wi-Fi.
-2. **Open the demo through it** — `http://<that address>/demo.html`, on the Mac or on
-   the iPhone itself — and press **Connect Apple Watch** in the header. The AI panel now
-   shows the exact ingest URL it is waiting on; the clock switches to real time.
-3. **Sanity-check without the phone first**: open
-   `http://<address>/ingest?hr=128&spo2=94` in any browser tab. Within a few seconds the
-   heart-rate tile reads 128 with an *Apple Watch* source label, and the standing orders
-   treat it like any other reading (set a rule's "for N min" to 1 to see it fire quickly).
-4. **Build the Shortcut on the iPhone** — Shortcuts app → **+** → name it *Riati Sync*:
-   1. *Find Health Samples* — Type: **Heart Rate** · Sort by: Start Date · Order: Latest First · Limit: 1
-   2. *Get Details of Health Sample* — **Value** (of the samples above)
-   3. *Find Health Samples* — Type: **Blood Oxygen Saturation** · Latest First · Limit: 1
-   4. *Get Details of Health Sample* — **Value**
-   5. *Text* — `http://<address>/ingest?hr=` *(first Value)* `&spo2=` *(second Value)*
-   6. *Get Contents of URL* — the Text above (GET is fine)
+**Start here:** double-click `Start Riati.command`, then follow **[WIFI-TEST.md](WIFI-TEST.md)** for the Mac account, iPhone certificate setup and Health Shortcut.
 
-   Allow Health access when prompted, then run it. The tiles update on the next poll.
-5. **Stream during a demo**: wrap steps 1–6 in *Repeat 30 times* with *Wait 60 seconds*
-   at the end. Start a workout (Other) on the watch: it then records heart rate every
-   few seconds instead of every few minutes, so each run sends a fresh value.
+The pilot runs on the same Wi-Fi using local HTTPS. Remote internet access is not deployed. The former unauthenticated `/live` and `/ingest` endpoints return 410. They must not be used with real data.
 
-Accepted fields: `hr`, `spo2`, `rr`, `sbp`, `dbp`, `temp`, `wt` (kg — absolute, or as a
-change from the 78 kg dry weight), `borg`, `steps`. A Bluetooth cuff and a smart scale
-that write to Apple Health can be sent the same way (`sbp`, `dbp`, `wt`). Each field
-stays valid for a clinically sensible window (heart rate 15 min, SpO₂ 2 h, blood
-pressure and weight 24 h); after that the simulation resumes for that field.
-
-`POST /ingest` with a JSON body does the same — that is what an aggregator service
-(Terra, Thryve, Validic) or a native HealthKit companion app would call.
+New files: `riati_server.py` (accounts and scoped APIs), `riati_tls.py` (short-lived local HTTPS), `portal/` (patient and care-team UI), `demo-enhancements.js` / `.css` (simulated explanations and role previews). Private local data is stored under `.riati/`, excluded from Git and HTTP serving.
 
 ## Running locally
 
-Both pages are static. `demo.html` opens directly in a browser; the landing page needs to
-be served over HTTP for its runtime to load:
+For the same-Wi-Fi pilot:
 
 ```bash
-python3 -m http.server 8734
+python3 watch_bridge.py 8750 --lan
 ```
 
-Then open <http://localhost:8734/Riati.dc.html>.
+For local-only development:
+
+```bash
+python3 watch_bridge.py 8740
+```
+
+Open the address printed by the server. `/` serves the landing page, `/portal/` serves accounts, and `/demo.html` remains the simulated clinical demo. A simple static file server cannot provide accounts or receive device readings.
+
+Run isolated backend tests with `python3 -m unittest discover -s tests -v`.
 
 ## Status and scope
 
@@ -132,3 +144,8 @@ within signed standing orders and never diagnoses. In an emergency in Saudi Arab
 
 Dr Malik A. Althobiani — Assistant Professor, Respiratory Therapy, King Abdulaziz
 University; PhD, UCL.
+
+## Compare demo layouts
+
+- `/demo.html`: the current redesigned patient and clinician workspace, unchanged.
+- `/demo-previous.html`: the layout from before the redesign, restored from the saved snapshot with its own JavaScript and stylesheet. Both pages use the existing demo engine and local standing-order preferences; real observations remain in `/portal/`.

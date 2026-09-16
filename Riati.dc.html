@@ -3,6 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./assets/vendor/react.production.min.js"></script>
+<script src="./assets/vendor/react-dom.production.min.js"></script>
 <script src="./support.js"></script>
 </head>
 <body>
@@ -47,7 +49,7 @@ input:focus{outline:2px solid #4F2D57;outline-offset:1px}
       <a href="#faqs" style="color:#4F2D57">{{ t.navFaqs }}</a>
     </div>
     <button onClick="{{ toggleLang }}" style="border:1px solid #D9CCE3;background:transparent;color:#4F2D57;border-radius:999px;padding:7px 14px;font-size:13px;cursor:pointer" style-hover="background:#EDE6F2">{{ t.langSwitch }}</button>
-    <a href="demo.html" style="background:#4F2D57;color:#FAF7F3;border-radius:999px;padding:9px 18px;font-size:14px;font-weight:500" style-hover="background:#2E1834">{{ t.tryDemo }}</a>
+    <a href="portal/" style="background:#4F2D57;color:#FAF7F3;border-radius:999px;padding:9px 18px;font-size:14px;font-weight:500;white-space:nowrap" style-hover="background:#2E1834">{{ t.accountLink }}</a>
   </nav>
 </header>
 
@@ -63,8 +65,8 @@ input:focus{outline:2px solid #4F2D57;outline-offset:1px}
       <a href="#trends" style="border:1px solid #D9CCE3;color:#4F2D57;border-radius:999px;padding:14px 26px;font-size:15px;display:inline-flex;align-items:center" style-hover="background:#EDE6F2">{{ t.heroCta2 }}</a>
     </div>
     <div style="display:flex;gap:28px;margin-top:44px;flex-wrap:wrap">
-      <div><div style="font-family:'Newsreader',serif;font-size:28px;color:#2E1834">4</div><div style="font-size:13px;color:#6B5C70">{{ t.stat1 }}</div></div>
-      <div><div style="font-family:'Newsreader',serif;font-size:28px;color:#2E1834">7·30·90</div><div style="font-size:13px;color:#6B5C70">{{ t.stat2 }}</div></div>
+      <div><div style="font-family:'Newsreader',serif;font-size:28px;color:#2E1834">{{ t.stat1n }}</div><div style="font-size:13px;color:#6B5C70">{{ t.stat1 }}</div></div>
+      <div><div style="font-family:'Newsreader',serif;font-size:28px;color:#2E1834">{{ t.stat2n }}</div><div style="font-size:13px;color:#6B5C70">{{ t.stat2 }}</div></div>
       <div><div style="font-family:'Newsreader',serif;font-size:28px;color:#2E1834">{{ t.stat3n }}</div><div style="font-size:13px;color:#6B5C70">{{ t.stat3 }}</div></div>
     </div>
   </div>
@@ -76,12 +78,12 @@ input:focus{outline:2px solid #4F2D57;outline-offset:1px}
         <div style="display:inline-flex;align-items:center;gap:8px;background:#E6F2EE;color:#1F6F5B;border-radius:999px;padding:6px 12px;font-size:12px;font-weight:600"><span style="width:8px;height:8px;border-radius:50%;background:#1F6F5B"></span>{{ t.zoneGreen }}</div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px">
-        <div style="background:#FAF7F3;border-radius:14px;padding:14px"><div style="font-size:12px;color:#6B5C70">SpO₂</div><div style="font-family:'Newsreader',serif;font-size:30px;color:#2E1834">96<span style="font-size:15px;color:#6B5C70">%</span></div></div>
-        <div style="background:#FAF7F3;border-radius:14px;padding:14px"><div style="font-size:12px;color:#6B5C70">{{ t.steps }}</div><div style="font-family:'Newsreader',serif;font-size:30px;color:#2E1834">4,820</div></div>
-        <div style="background:#FAF7F3;border-radius:14px;padding:14px"><div style="font-size:12px;color:#6B5C70">PEF</div><div style="font-family:'Newsreader',serif;font-size:30px;color:#2E1834">410<span style="font-size:15px;color:#6B5C70"> L/min</span></div></div>
-        <div style="background:#FAF7F3;border-radius:14px;padding:14px"><div style="font-size:12px;color:#6B5C70">{{ t.symptoms }}</div><div style="font-family:'Newsreader',serif;font-size:30px;color:#2E1834">1<span style="font-size:15px;color:#6B5C70">/5</span></div></div>
+        <div style="background:#FAF7F3;border-radius:14px;padding:14px"><div style="font-size:12px;color:#6B5C70">{{ t.spo2Short }}</div><div style="font-family:'Newsreader',serif;font-size:30px;color:#2E1834">{{ t.cardSpo2 }}<span style="font-size:15px;color:#6B5C70">{{ t.pct }}</span></div></div>
+        <div style="background:#FAF7F3;border-radius:14px;padding:14px"><div style="font-size:12px;color:#6B5C70">{{ t.steps }}</div><div style="font-family:'Newsreader',serif;font-size:30px;color:#2E1834">{{ t.cardSteps }}</div></div>
+        <div style="background:#FAF7F3;border-radius:14px;padding:14px"><div style="font-size:12px;color:#6B5C70">{{ t.pefShort }}</div><div style="font-family:'Newsreader',serif;font-size:30px;color:#2E1834">{{ t.cardPef }}<span style="font-size:15px;color:#6B5C70">{{ t.lmin }}</span></div></div>
+        <div style="background:#FAF7F3;border-radius:14px;padding:14px"><div style="font-size:12px;color:#6B5C70">{{ t.symptoms }}</div><div style="font-family:'Newsreader',serif;font-size:30px;color:#2E1834">{{ t.cardSym }}<span style="font-size:15px;color:#6B5C70">{{ t.of5 }}</span></div></div>
       </div>
-      <div style="font-size:12px;color:#6B5C70;margin-bottom:8px">SpO₂ · {{ t.last14 }}</div>
+      <div style="font-size:12px;color:#6B5C70;margin-bottom:8px">{{ t.spo2Short }} · {{ t.last14 }}</div>
       {{ heroSpark }}
       <div style="font-size:12px;color:#6B5C70;margin-top:12px;border-top:1px dashed #E6DDE9;padding-top:10px">{{ t.cardNote }}</div>
     </div>
@@ -196,9 +198,9 @@ input:focus{outline:2px solid #4F2D57;outline-offset:1px}
   <div data-reveal="" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px">
     <div style="grid-column:1/-1;background:#fff;border:1px solid #E6DDE9;border-radius:24px;padding:24px 24px 16px">
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:10px">
-        <div style="font-family:'Newsreader',serif;font-size:22px;color:#2E1834">SpO₂ · {{ t.demoParticipant }}</div>
+        <div style="font-family:'Newsreader',serif;font-size:22px;color:#2E1834">{{ t.spo2Short }} · {{ t.demoParticipant }}</div>
         <div style="display:flex;gap:18px;font-size:12px;color:#6B5C70;flex-wrap:wrap">
-          <span style="display:inline-flex;align-items:center;gap:6px"><span style="width:14px;height:2px;background:#4F2D57;display:inline-block"></span>SpO₂ %</span>
+          <span style="display:inline-flex;align-items:center;gap:6px"><span style="width:14px;height:2px;background:#4F2D57;display:inline-block"></span>{{ t.spo2Short }} {{ t.pct }}</span>
           <span style="display:inline-flex;align-items:center;gap:6px"><span style="width:14px;height:0;border-top:2px dashed #A8323E;display:inline-block"></span>{{ t.threshold90 }}</span>
           <span style="display:inline-flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:50%;background:#C9822B;display:inline-block"></span>{{ t.flagged }}</span>
         </div>
@@ -313,7 +315,7 @@ input:focus{outline:2px solid #4F2D57;outline-offset:1px}
 
 </div>
 </x-dc>
-<script data-dc-script data-props='{"defaultLang":{"editor":"enum","options":["en","ar"],"default":"en","tsType":"'en'|'ar'","section":"Language"}}'>
+<script type="text/plain" data-dc-script data-props='{"defaultLang":{"editor":"enum","options":["en","ar"],"default":"en","tsType":"'en'|'ar'","section":"Language"}}'>
 class Component extends DCLogic {
   state = { lang: null, range: 30, openFaq: 0 };
   componentDidMount() {
@@ -327,6 +329,8 @@ class Component extends DCLogic {
   componentDidUpdate() { this.observeAll(); }
   observeAll() { if (!this.io) return; document.querySelectorAll('[data-reveal]:not([data-reveal="in"])').forEach(el => this.io.observe(el)); }
   componentWillUnmount() { this.io && this.io.disconnect(); }
+  // Arabic mode renders Arabic-Indic digits, "٫" decimals and "٪"
+  nd(s) { return this.state.lang === 'ar' ? String(s).replace(/(\d)\.(\d)/g, '$1٫$2').replace(/[0-9]/g, d => '٠١٢٣٤٥٦٧٨٩'[d]).replace(/%/g, '٪') : String(s); }
   demoData(n) {
     const out = []; let v = 95.5;
     for (let i = 0; i < n; i++) {
@@ -345,12 +349,12 @@ class Component extends DCLogic {
     const d = pts.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ');
     const area = d + ' L' + pts[pts.length - 1][0].toFixed(1) + ',' + (H - pad) + ' L' + pad + ',' + (H - pad) + ' Z';
     const grid = [];
-    for (let i = 0; i <= 4; i++) { const v = lo + ((hi - lo) * i) / 4, y = ys(v); grid.push(React.createElement('g', { key: 'g' + i }, React.createElement('line', { x1: pad, x2: W - pad, y1: y, y2: y, stroke: '#EDE6F2' }), React.createElement('text', { x: pad - 8, y: y + 4, fontSize: 11, fill: '#6B5C70', textAnchor: 'end' }, Math.round(v) + unit))); }
+    for (let i = 0; i <= 4; i++) { const v = lo + ((hi - lo) * i) / 4, y = ys(v); grid.push(React.createElement('g', { key: 'g' + i }, React.createElement('line', { x1: pad, x2: W - pad, y1: y, y2: y, stroke: '#EDE6F2' }), React.createElement('text', { x: pad - 8, y: y + 4, fontSize: 11, fill: '#6B5C70', textAnchor: 'end' }, this.nd(Math.round(v) + unit)))); }
     const flags = threshold != null ? pts.filter((p, i) => flagBelow ? values[i] < threshold : values[i] > threshold).map((p, i) => React.createElement('circle', { key: 'f' + i, cx: p[0], cy: p[1], r: 5, fill: '#C9822B', stroke: '#fff', strokeWidth: 2, style: { animation: 'pop .5s ' + (1.4 + i * 0.1) + 's both' } })) : [];
     const last = pts[pts.length - 1];
     const dots = labels ? pts.map((p, i) => React.createElement('circle', { key: 'p' + i, cx: p[0], cy: p[1], r: 4, fill: '#fff', stroke: color, strokeWidth: 2, style: { animation: 'pop .4s ' + (0.4 + i * 0.08) + 's both' } }, React.createElement('title', null, (labels[i] || '') + ': ' + values[i] + unit))) : [];
     const step = labels ? Math.max(1, Math.ceil(labels.length / 10)) : 1;
-    const xl = labels ? labels.map((l, i) => (i % step === 0 || i === labels.length - 1) ? React.createElement('text', { key: 'x' + i, x: pts[i][0], y: H - pad + 18, fontSize: 11, fill: '#6B5C70', textAnchor: 'middle' }, l) : null) : [];
+    const xl = labels ? labels.map((l, i) => (i % step === 0 || i === labels.length - 1) ? React.createElement('text', { key: 'x' + i, x: pts[i][0], y: H - pad + 18, fontSize: 11, fill: '#6B5C70', textAnchor: 'middle' }, this.nd(l)) : null) : [];
     return React.createElement('svg', { key: key + n + (this.state.lang || ''), viewBox: '0 0 ' + W + ' ' + H, direction: 'ltr', style: { width: '100%', height: 'auto', display: 'block', overflow: 'visible' } },
       React.createElement('defs', null, React.createElement('linearGradient', { id: 'grad' + key, x1: 0, y1: 0, x2: 0, y2: 1 }, React.createElement('stop', { offset: 0, stopColor: color, stopOpacity: 0.22 }), React.createElement('stop', { offset: 1, stopColor: color, stopOpacity: 0 }))),
       grid,
@@ -359,7 +363,7 @@ class Component extends DCLogic {
       React.createElement('path', { d, fill: 'none', stroke: color, strokeWidth: 2.5, strokeLinejoin: 'round', strokeLinecap: 'round', strokeDasharray: 3000, strokeDashoffset: 3000, style: { animation: 'draw 1.8s cubic-bezier(.4,0,.2,1) forwards' } }),
       xl, dots, flags,
       React.createElement('circle', { cx: last[0], cy: last[1], r: 6, fill: color, stroke: '#fff', strokeWidth: 3, style: { animation: 'pop .5s 1.7s both' } }),
-      React.createElement('text', { x: last[0], y: last[1] - 14, fontSize: 13, fill: '#2E1834', textAnchor: 'middle', fontFamily: 'Newsreader, serif', style: { animation: 'pop .5s 1.8s both' } }, values[values.length - 1] + unit));
+      React.createElement('text', { x: last[0], y: last[1] - 14, fontSize: 13, fill: '#2E1834', textAnchor: 'middle', fontFamily: 'Newsreader, serif', style: { animation: 'pop .5s 1.8s both' } }, this.nd(values[values.length - 1] + unit)));
   }
   spark(values) {
     const W = 360, H = 70, pts = values.map((v, i) => [(i * W) / (values.length - 1), H - ((v - 88) / 12) * H]);
@@ -372,8 +376,8 @@ class Component extends DCLogic {
   }
   T() {
     const en = {
-      langSwitch: 'العربية', navDemo: 'Live clinical demo', clinicalDemo: 'Watch the AI monitor live', navProblem: 'Problem', navSolution: 'Solution', navTrends: 'Trends', navPlan: 'Action plan', navRoadmap: 'Roadmap', navFaqs: 'FAQs', myProgress: 'My progress', createAccount: 'Create account', signIn: 'Sign in', signOut: 'Sign out',
-      heroKicker: 'Respiratory health · Home follow-up', heroTitle: 'Chronic lung disease is continuous. Care should not be intermittent.', heroBody: 'Riati lets patients record oxygen saturation, home breathing tests, steps and symptoms every day, then classifies each reading against clinician-set rules so the care team sees who needs attention before a crisis.', heroCta: 'Try the demo', heroCta2: 'See the trends', stat1: 'daily measures', stat2: 'day trend windows', stat3n: 'AR / EN', stat3: 'built in Arabic first',
+      langSwitch: 'العربية', navDemo: 'Live clinical demo', clinicalDemo: 'Watch the AI monitor live', spo2Short: 'SpO₂', pefShort: 'PEF', lmin: ' L/min', pct: '%', cardSpo2: '96', cardSteps: '4,820', cardPef: '410', cardSym: '1', of5: '/5', stat1n: '4', stat2n: '7·30·90', navProblem: 'Problem', navSolution: 'Solution', navTrends: 'Trends', navPlan: 'Action plan', navRoadmap: 'Roadmap', navFaqs: 'FAQs', myProgress: 'My progress', createAccount: 'Create account', signIn: 'Sign in', signOut: 'Sign out',
+      accountLink: 'Create account / sign in', heroKicker: 'Respiratory health · Home follow-up', heroTitle: 'Chronic lung disease is continuous. Care should not be intermittent.', heroBody: 'Riati lets patients record oxygen saturation, home breathing tests, steps and symptoms every day, then classifies each reading against clinician-set rules so the care team sees who needs attention before a crisis.', heroCta: 'Try the demo', heroCta2: 'See the trends', stat1: 'daily measures', stat2: 'day trend windows', stat3n: 'AR / EN', stat3: 'built in Arabic first',
       cardToday: 'Today', cardTitle: 'Daily check-in', zoneGreen: 'Green · Routine care', steps: 'Steps', symptoms: 'Symptoms', last14: 'last 14 days', cardNote: 'Rules are published and adjustable. No opaque algorithm.',
       m1: 'Designed in Arabic from the ground up', m2: 'Transparent clinical rules', m3: 'Research-grade governance from day one', m4: 'Live at raitie.com',
       problemKicker: 'The problem', problemTitle: 'Decline starts at home, weeks before the crisis. Nobody sees it.',
@@ -389,8 +393,8 @@ class Component extends DCLogic {
       navSteps: 'How it works', tryDemo: 'Try the demo', heroDemoNote: 'No account needed. Start as a guest, enter your readings, and create an account later to keep them.', guest: 'Guest', exitDemo: 'Exit demo', saveProgress: 'Save my progress', baselineTitle: 'Step 1 · Set your baseline', baselineBody: 'Enter today\u2019s readings. Your first entries become the personal baseline that later readings are compared with.', baselineForm: 'Your baseline', stepsTitle: 'Three clear steps', recordKicker: 'What you log daily', recordTitle: 'What can you record?', welcome: 'Welcome back, ', streak: 'check-ins saved', incomplete: 'Assessment incomplete', zGreen: 'Green', zAmber: 'Amber', zRed: 'Red', msgGreen: 'Follow your daily plan. Your readings meet your agreed criteria.', msgAmber: 'Follow your signed instructions and contact your named service within the stated time.', msgRed: 'Follow your approved emergency instructions now. In Saudi Arabia call 997. Do not wait for a clinic reply.', msgInc: 'Enter an SpO₂ reading to complete today\u2019s assessment. Incomplete never means green.', lastSpo2: 'Last SpO₂', avg7: '7-day avg SpO₂', below90: 'Readings under 90%', errExists: 'An account with this email already exists. Sign in instead.', errNo: 'No account found for this email.', errPass: 'Incorrect password.', days: 'days'
     };
     const ar = {
-      langSwitch: 'English', navDemo: 'العرض السريري المباشر', clinicalDemo: 'شاهد المراقب الذكي مباشرة', navProblem: 'المشكلة', navSolution: 'الحل', navTrends: 'الاتجاهات', navPlan: 'خطة العمل', navRoadmap: 'خريطة الطريق', navFaqs: 'الأسئلة الشائعة', myProgress: 'تقدمي', createAccount: 'إنشاء حساب', signIn: 'تسجيل الدخول', signOut: 'تسجيل الخروج',
-      heroKicker: 'صحة الجهاز التنفسي, متابعة منزلية', heroTitle: 'الأمراض التنفسية المزمنة مستمرة، فلماذا تكون الرعاية متقطعة؟', heroBody: 'تتيح «رئتي» للمريض تسجيل التشبع بالأكسجين وفحص التنفس المنزلي والخطوات والأعراض يوميًا، ثم تصنّف كل قراءة وفق قواعد سريرية معلنة ليرى الفريق من يحتاج إلى العناية قبل الأزمة.', heroCta: 'جرّب المنصة', heroCta2: 'شاهد الاتجاهات', stat1: 'قياسات يومية', stat2: 'نوافذ الاتجاه بالأيام', stat3n: 'عربي / EN', stat3: 'صُممت بالعربية من الأساس',
+      langSwitch: 'English', navDemo: 'العرض السريري المباشر', clinicalDemo: 'شاهد المراقب الذكي مباشرة', spo2Short: 'نسبة الأكسجين', pefShort: 'ذروة التدفق', lmin: ' لتر/د', pct: '٪', cardSpo2: '٩٦', cardSteps: '٤٬٨٢٠', cardPef: '٤١٠', cardSym: '١', of5: '/٥', stat1n: '٤', stat2n: '٧·٣٠·٩٠', navProblem: 'المشكلة', navSolution: 'الحل', navTrends: 'الاتجاهات', navPlan: 'خطة العمل', navRoadmap: 'خريطة الطريق', navFaqs: 'الأسئلة الشائعة', myProgress: 'تقدمي', createAccount: 'إنشاء حساب', signIn: 'تسجيل الدخول', signOut: 'تسجيل الخروج',
+      accountLink: 'إنشاء حساب / دخول', heroKicker: 'صحة الجهاز التنفسي, متابعة منزلية', heroTitle: 'الأمراض التنفسية المزمنة مستمرة، فلماذا تكون الرعاية متقطعة؟', heroBody: 'تتيح «رئتي» للمريض تسجيل التشبع بالأكسجين وفحص التنفس المنزلي والخطوات والأعراض يوميًا، ثم تصنّف كل قراءة وفق قواعد سريرية معلنة ليرى الفريق من يحتاج إلى العناية قبل الأزمة.', heroCta: 'جرّب المنصة', heroCta2: 'شاهد الاتجاهات', stat1: 'قياسات يومية', stat2: 'نوافذ الاتجاه بالأيام', stat3n: 'عربي / EN', stat3: 'صُممت بالعربية من الأساس',
       cardToday: 'اليوم', cardTitle: 'التسجيل اليومي', zoneGreen: 'أخضر · رعاية روتينية', steps: 'الخطوات', symptoms: 'الأعراض', last14: 'آخر ١٤ يومًا', cardNote: 'قواعد معلنة وقابلة للتعديل، لا خوارزمية مبهمة.',
       m1: 'صُممت بالعربية من الأساس', m2: 'قواعد سريرية شفافة', m3: 'حوكمة بمعايير البحث العلمي منذ اليوم الأول', m4: 'تعمل الآن على raitie.com',
       problemKicker: 'المشكلة', problemTitle: 'يبدأ التراجع في المنزل قبل الأزمة بأسابيع، ولا يلحظه أحد.',
@@ -402,8 +406,8 @@ class Component extends DCLogic {
       faqKicker: 'الأسئلة الشائعة', faqTitle: 'ما يسأله الناس قبل الانضمام.',
       progKicker: 'تقدمي', checkinTitle: 'تسجيل اليوم', date: 'التاريخ', saveEntry: 'حفظ التسجيل', checkinNote: 'كل حفظ يضيف نقطة إلى اتجاهك. غيّر التاريخ لتسجيل أيام سابقة. اترك الحقل فارغًا إن لم تقسه.', todayZone: 'آخر تقييم', yourTrend: 'اتجاهك', emptyChart: 'لا قراءات لهذا المؤشر بعد. احفظ تسجيلًا يتضمنه أو بدّل المؤشر أعلاه.',
       authBlurb: 'يحفظ حسابك قراءاتك اليومية وسجل اتجاهاتك لتتابع من حيث توقفت.', fullName: 'الاسم الكامل', email: 'البريد الإلكتروني', password: 'كلمة المرور (٦ أحرف أو أكثر)', authNote: 'حساب تجريبي يُحفظ على هذا الجهاز فقط. ليس للاستخدام السريري.',
-      footBlurb: '«رئتي» منصة بحثية لصحة الجهاز التنفسي. يسجّل المشاركون الأعراض اليومية ومستوى الأكسجين ونتائج فحص التنفس المنزلي وعدد الخطوات، ويراجعون قراءاتهم بمرور الوقت.', footSupervisor: 'المشرف الأكاديمي', footSupervisorName: 'د. مالك الثبيتي', footSupervisorRole: 'أستاذ مساعد بقسم العلاج التنفسي، جامعة الملك عبدالعزيز · دكتوراه من UCL', footDisclaimer: 'نموذج بحثي، لا يغني عن الرأي السريري. في الحالات الطارئة داخل المملكة اتصل بـ 997.',
-      navSteps: 'كيف تعمل', tryDemo: 'جرّب المنصة', heroDemoNote: 'لا حاجة لحساب. ابدأ كضيف وأدخل قراءاتك، وأنشئ حسابًا لاحقًا للاحتفاظ بها.', guest: 'ضيف', exitDemo: 'إنهاء التجربة', saveProgress: 'احفظ تقدمي', baselineTitle: 'الخطوة ١ · حدّد خط الأساس', baselineBody: 'أدخل قراءات اليوم. تصبح إدخالاتك الأولى خط الأساس الشخصي الذي تُقارن به القراءات اللاحقة.', baselineForm: 'خط الأساس', stepsTitle: 'ثلاث خطوات واضحة', recordKicker: 'ما الذي تسجّله يوميًا', recordTitle: 'ما الذي يمكنك تسجيله؟', welcome: 'أهلًا بعودتك، ', streak: 'تسجيلات محفوظة', incomplete: 'تقييم غير مكتمل', zGreen: 'أخضر', zAmber: 'أصفر', zRed: 'أحمر', msgGreen: 'اتبع خطتك اليومية. قراءاتك تستوفي معاييرك المتفق عليها.', msgAmber: 'اتبع تعليماتك الموقّعة وتواصل مع الخدمة المسماة خلال الوقت المحدد.', msgRed: 'اتبع تعليمات الطوارئ المعتمدة الآن. داخل المملكة اتصل بـ 997. لا تنتظر رد العيادة.', msgInc: 'أدخل قراءة SpO₂ لإكمال تقييم اليوم. غير المكتمل لا يعني أخضر أبدًا.', lastSpo2: 'آخر SpO₂', avg7: 'متوسط ٧ أيام', below90: 'قراءات دون ٩٠٪', errExists: 'يوجد حساب بهذا البريد. سجّل الدخول بدلًا من ذلك.', errNo: 'لا يوجد حساب بهذا البريد.', errPass: 'كلمة المرور غير صحيحة.', days: 'يومًا'
+      footBlurb: '«رئتي» منصة بحثية لصحة الجهاز التنفسي. يسجّل المشاركون الأعراض اليومية ومستوى الأكسجين ونتائج فحص التنفس المنزلي وعدد الخطوات، ويراجعون قراءاتهم بمرور الوقت.', footSupervisor: 'المشرف الأكاديمي', footSupervisorName: 'د. مالك الثبيتي', footSupervisorRole: 'أستاذ مساعد بقسم العلاج التنفسي، جامعة الملك عبدالعزيز · دكتوراه من UCL', footDisclaimer: 'نموذج بحثي، لا يغني عن الرأي السريري. في الحالات الطارئة داخل المملكة اتصل بـ ٩٩٧.',
+      navSteps: 'كيف تعمل', tryDemo: 'جرّب المنصة', heroDemoNote: 'لا حاجة لحساب. ابدأ كضيف وأدخل قراءاتك، وأنشئ حسابًا لاحقًا للاحتفاظ بها.', guest: 'ضيف', exitDemo: 'إنهاء التجربة', saveProgress: 'احفظ تقدمي', baselineTitle: 'الخطوة ١ · حدّد خط الأساس', baselineBody: 'أدخل قراءات اليوم. تصبح إدخالاتك الأولى خط الأساس الشخصي الذي تُقارن به القراءات اللاحقة.', baselineForm: 'خط الأساس', stepsTitle: 'ثلاث خطوات واضحة', recordKicker: 'ما الذي تسجّله يوميًا', recordTitle: 'ما الذي يمكنك تسجيله؟', welcome: 'أهلًا بعودتك، ', streak: 'تسجيلات محفوظة', incomplete: 'تقييم غير مكتمل', zGreen: 'أخضر', zAmber: 'أصفر', zRed: 'أحمر', msgGreen: 'اتبع خطتك اليومية. قراءاتك تستوفي معاييرك المتفق عليها.', msgAmber: 'اتبع تعليماتك الموقّعة وتواصل مع الخدمة المسماة خلال الوقت المحدد.', msgRed: 'اتبع تعليمات الطوارئ المعتمدة الآن. داخل المملكة اتصل بـ ٩٩٧. لا تنتظر رد العيادة.', msgInc: 'أدخل قراءة نسبة الأكسجين لإكمال تقييم اليوم. غير المكتمل لا يعني أخضر أبدًا.', lastSpo2: 'آخر قراءة أكسجين', avg7: 'متوسط ٧ أيام', below90: 'قراءات دون ٩٠٪', errExists: 'يوجد حساب بهذا البريد. سجّل الدخول بدلًا من ذلك.', errNo: 'لا يوجد حساب بهذا البريد.', errPass: 'كلمة المرور غير صحيحة.', days: 'يومًا'
     };
     return this.state.lang === 'ar' ? ar : en;
   }
@@ -414,11 +418,11 @@ class Component extends DCLogic {
         { title: 'التأخر يتحول إلى دخول اضطراري', body: 'يحوّل التأخر في الاكتشاف تدهورًا يمكن تداركه إلى دخول للمستشفى: أسوأ النتائج على المريض وأكثرها كلفة على النظام الصحي.' },
         { title: 'رسائل متفرقة وفجوات في المسؤولية', body: 'حين تصل القراءات عبر مكالمات ورسائل متفرقة، يعيد الموظفون بناء السجل ويتحققون ممن استجاب. ولا أحد يعرف يقينًا من تصرّف.' }
       ],
-      measures: [{ name: 'SpO₂', desc: 'التشبع بالأكسجين أثناء الراحة' }, { name: 'PEF', desc: 'فحص وظائف الرئة المنزلي' }, { name: 'الخطوات', desc: 'عدد الخطوات اليومي' }, { name: 'الأعراض', desc: 'استبيان تنفسي قصير' }],
+      measures: [{ name: 'نسبة الأكسجين', desc: 'التشبع بالأكسجين في الدم أثناء الراحة' }, { name: 'ذروة التدفق', desc: 'فحص وظائف الرئة المنزلي' }, { name: 'الخطوات', desc: 'عدد الخطوات اليومي' }, { name: 'الأعراض', desc: 'استبيان تنفسي قصير' }],
       zones: [
         { name: 'أخضر · رعاية روتينية', rule: 'وفق معايير المريض', patient: 'اتبع الخطة اليومية عندما تستوفي المعلومات الحالية المطلوبة معايير المريض المتفق عليها.', clinic: 'العيادة: تسجيل التسجيل اليومي ونسخة الخطة المستخدمة.', color: '#1F6F5B' },
-        { name: 'أصفر · تواصل مع الفريق', rule: 'SpO₂ أقل من ٩٢٪ أو هبوط PEF ١٥٪', patient: 'اتبع التعليمات الموقّعة وتواصل مع الخدمة المسماة خلال الوقت المحدد.', clinic: 'العيادة: إنشاء مهمة بمالك ووقت استحقاق ومسار تصعيد.', color: '#C9822B' },
-        { name: 'أحمر · إجراء عاجل', rule: 'SpO₂ أقل من ٩٠٪ أثناء الراحة', patient: 'تُعرض تعليمات الطوارئ المعتمدة فورًا، بما فيها 997 للإسعاف السعودي. لا تنتظر رد العيادة.', clinic: 'العيادة: تسجيل المحفّز وإشعار الفريق؛ ولا يؤخر الإشعار تعليمات المريض.', color: '#A8323E' }
+        { name: 'أصفر · تواصل مع الفريق', rule: 'نسبة الأكسجين أقل من ٩٢٪ أو هبوط ذروة التدفق ١٥٪', patient: 'اتبع التعليمات الموقّعة وتواصل مع الخدمة المسماة خلال الوقت المحدد.', clinic: 'العيادة: إنشاء مهمة بمالك ووقت استحقاق ومسار تصعيد.', color: '#C9822B' },
+        { name: 'أحمر · إجراء عاجل', rule: 'نسبة الأكسجين أقل من ٩٠٪ أثناء الراحة', patient: 'تُعرض تعليمات الطوارئ المعتمدة فورًا، بما فيها ٩٩٧ للإسعاف السعودي. لا تنتظر رد العيادة.', clinic: 'العيادة: تسجيل المحفّز وإشعار الفريق؛ ولا يؤخر الإشعار تعليمات المريض.', color: '#A8323E' }
       ],
       pillars: [
         { glyph: 'خ', title: 'خطة عمل شخصية', body: 'يضبط الطبيب عتبات التشبع والأعراض لكل فرد ومرض، ويوقّع الخطة مع تاريخ المراجعة. تُحفظ نسخة قابلة للطباعة، ولا يغيّر تحديث القالب خطة فعّالة دون مراجعة.', tag: 'الطبيب يوقّع' },
@@ -428,7 +432,7 @@ class Component extends DCLogic {
       whys: [
         { title: 'صُممت بالعربية من الأساس', body: 'ميزة تنافسية حقيقية في السوق السعودية والعربية، وليست نسخة مترجمة عن منصة أجنبية.' },
         { title: 'قواعد سريرية شفافة', body: 'تكسب ما لا يكسبه الذكاء الاصطناعي الغامض: ثقة الأطباء ولجان أخلاقيات البحث والجهات التنظيمية.' },
-        { title: 'حوكمة بمعايير البحث منذ اليوم الأول', body: 'موافقة مستنيرة، وعزل للبيانات على مستوى كل سجل، وسجل تدقيق كامل، وتصدير مجهّل.' },
+        { title: 'حوكمة بمعايير البحث منذ اليوم الأول', body: 'يسجّل الاختبار المحلي الموافقة ويحفظ الملاحظات لكل حساب. يتحكم المريض بمشاركة فريق الرعاية؛ النشر البحثي عن بُعد مرحلة لاحقة.' },
         { title: 'بُنيت بجزء يسير من الكلفة المعتادة', body: 'الأساس مكتمل ويعمل اليوم على raitie.com؛ كل بند قابل للتجربة في العرض الحي.' }
       ],
       phases: [
@@ -442,7 +446,7 @@ class Component extends DCLogic {
         { q: 'كيف تُصنَّف قراءاتي؟', a: 'بقواعد سريرية معلنة لا خوارزمية مبهمة: انخفاض التشبع دون ٩٠٪ أثناء الراحة، وهبوط الوظيفة الرئوية ١٥٪ عن خط أساسك، وتصاعد الأعراض، وانقطاع التسجيل ثلاثة أيام. يمكن للأطباء تعديل هذه العتبات لكل مريض.' },
         { q: 'ماذا يحدث إذا لم أُسجّل قراءة؟', a: 'تظهر حالتك «تقييم غير مكتمل». لا تُعدّ القراءة الناقصة أو القديمة خضراء أبدًا، وتبقى التعليمات العاجلة ظاهرة لك دون الحاجة إلى قراءة.' },
         { q: 'هل يمكن لأحد أفراد أسرتي مساعدتي؟', a: 'نعم. بموافقة مسجّلة يمكن لقريب مخوّل إدخال القياسات والأعراض عنك. تُميّز الصلاحيات بين العرض والإدخال والتذكير، وكلها قابلة للإلغاء، ويسجّل النظام من أدخل كل قراءة.' },
-        { q: 'أين تُحفظ بياناتي ومن يراها؟', a: 'حسابات آمنة مع موافقة مستنيرة إلكترونية، وعزل للبيانات على مستوى كل سجل داخل قاعدة البيانات، وسجل تدقيق كامل. لا يمكن لعيادة أخرى الوصول إلى سجلاتك، والتصدير البحثي مجهّل الهوية.' },
+        { q: 'أين تُحفظ بياناتي ومن يراها؟', a: 'في الاختبار المحلي تُحفظ الحسابات والملاحظات على جهاز ماك الذي يشغّل رئتي. يوافق المريض على مشاركة الفريق ويمكنه إلغاؤها. الاستضافة عن بُعد والتحقق بالبريد والتصدير البحثي المجهّل غير مفعّلة بعد.' },
         { q: 'هل تستخدم المنصة الذكاء الاصطناعي؟', a: 'لا في التصنيف ولا في القرار السريري. الإصدار الأول يعتمد على قواعد معتمدة من الأطباء. قد يُضاف لاحقًا دعم لغوي محدود، لا يملك صلاحية التشخيص أو تغيير الأدوية أو العتبات.' },
         { q: 'هل يمكنني استخدامها على هاتفي؟', a: 'نعم. تُثبَّت على أي هاتف من المتصفح، بواجهة عربية من الأساس مع خيار الإنجليزية.' }
       ],
@@ -452,9 +456,9 @@ class Component extends DCLogic {
         { title: 'راجع تغيّر القراءات', body: 'رسوم بيانية لآخر ٧ أو ٣٠ أو ٩٠ يومًا، ويطّلع فريق البحث على القراءات ضمن مشاركتك في الدراسة.' }
       ],
       records: [
-        { unit: '0–10', title: 'الأعراض اليومية', body: 'قيّم ضيق التنفس والسعال والإرهاق على مقياس من صفر إلى عشرة.', note: 'يدويًا · دقيقة واحدة' },
-        { unit: 'SpO₂ %', title: 'نسبة الأكسجين في الدم', body: 'أدخل قراءة جهاز قياس الأكسجين في الدم الذي يوضع على الإصبع أثناء الراحة.', note: 'عتبة الراحة ٩٠٪' },
-        { unit: 'FEV1 · PEF', title: 'اختبار التنفس المنزلي', body: 'انسخ من جهازك أو تقريرك كمية الهواء في أول ثانية أو ذروة التدفق.', note: 'مقارنة بخط أساسك' },
+        { unit: '٠–١٠', title: 'الأعراض اليومية', body: 'قيّم ضيق التنفس والسعال والإرهاق على مقياس من صفر إلى عشرة.', note: 'يدويًا · دقيقة واحدة' },
+        { unit: 'نسبة الأكسجين ٪', title: 'نسبة الأكسجين في الدم', body: 'أدخل قراءة جهاز قياس الأكسجين في الدم الذي يوضع على الإصبع أثناء الراحة.', note: 'عتبة الراحة ٩٠٪' },
+        { unit: 'حجم الزفير · ذروة التدفق', title: 'اختبار التنفس المنزلي', body: 'انسخ من جهازك أو تقريرك كمية الهواء في أول ثانية أو ذروة التدفق.', note: 'مقارنة بخط أساسك' },
         { unit: 'خطوات', title: 'النشاط والخطوات', body: 'أضف عدد خطواتك اليومية. يُدخل العدد يدويًا؛ ونقل الخطوات تلقائيًا من الساعة في المرحلة التالية.', note: 'يدويًا حاليًا' }
       ],
       metrics: [['spo2', 'SpO₂'], ['pef', 'PEF'], ['steps', 'الخطوات'], ['sym', 'الأعراض']]
@@ -478,7 +482,7 @@ class Component extends DCLogic {
       whys: [
         { title: 'Designed in Arabic from the ground up', body: 'A real competitive advantage in the Saudi and Arab market, not a translated copy of a foreign platform.' },
         { title: 'Transparent clinical rules', body: 'They win what opaque AI cannot: the trust of clinicians, research ethics committees and regulators.' },
-        { title: 'Research-grade governance from day one', body: 'Informed e-consent, row-level data isolation, a full audit log and anonymised export.' },
+        { title: 'Research-grade governance from day one', body: 'The local pilot records consent and keeps account-specific observations. Patients control care-team sharing; remote research deployment is a later phase.' },
         { title: 'Built at a fraction of the usual cost', body: 'The foundation is complete and running today at raitie.com; every item is testable in the live demo.' }
       ],
       phases: [
@@ -492,7 +496,7 @@ class Component extends DCLogic {
         { q: 'How are my readings classified?', a: 'By published clinical rules, not an opaque algorithm: saturation under 90% at rest, lung function 15% below your own baseline, rising symptoms, or three days without a record. Clinicians can adjust these thresholds per patient.' },
         { q: 'What happens if I miss a reading?', a: 'Your status shows "assessment incomplete". A missing or stale reading never defaults to green, and urgent instructions stay visible to you without a reading.' },
         { q: 'Can a family member help me?', a: 'Yes. With recorded consent, an authorised relative can enter measurements and symptoms on your behalf. Viewing, entry and reminder permissions are separate and revocable, and every entry records who made it.' },
-        { q: 'Where is my data kept and who sees it?', a: 'Secure accounts with electronic informed consent, row-level data isolation in the database, and a full audit log. Another clinic cannot reach your records, and research exports are anonymised.' },
+        { q: 'Where is my data kept and who sees it?', a: 'In the local pilot, accounts and observations are stored on the Mac running Riati. Patients explicitly approve care-team access and can revoke it. Remote hosting, email verification and anonymised research exports are not yet enabled.' },
         { q: 'Does the platform use artificial intelligence?', a: 'Not for classification or clinical decisions. The first release uses clinician-approved rules. A limited language-support service may come later, with no authority to diagnose, change medicines or set thresholds.' },
         { q: 'Can I use it on my phone?', a: 'Yes. It installs on any phone from the browser, with an Arabic-first interface and an English option.' }
       ],
@@ -521,17 +525,17 @@ class Component extends DCLogic {
       toggleLang: () => { const l = ar ? 'en' : 'ar'; localStorage.setItem('riati_lang', l); this.setState({ lang: l }); },
       heroSpark: this.spark(this.demoData(14)),
       demoChart: this.chart(demo, { min: 84, max: 100, threshold: 90, unit: '%', key: 'd' + s.range }),
-      ranges: [7, 30, 90].map(r => ({ label: r + ' ' + t.days, onClick: () => this.setState({ range: r }), bg: s.range === r ? '#4F2D57' : 'transparent', fg: s.range === r ? '#FAF7F3' : '#4F2D57' })),
+      ranges: [7, 30, 90].map(r => ({ label: this.nd(r) + ' ' + t.days, onClick: () => this.setState({ range: r }), bg: s.range === r ? '#4F2D57' : 'transparent', fg: s.range === r ? '#FAF7F3' : '#4F2D57' })),
       trendStats: [
-        { label: ar ? 'متوسط الفترة' : 'Period average', value: avg(demo).toFixed(1) + '%', note: ar ? 'خط الأساس الشخصي' : 'personal baseline', color: '#6B5C70' },
-        { label: ar ? 'أدنى قراءة' : 'Lowest reading', value: Math.min(...demo).toFixed(1) + '%', note: ar ? 'في نافذة ' + s.range + ' يومًا' : 'in the ' + s.range + '-day window', color: '#6B5C70' },
-        { label: t.flagged, value: flaggedN, note: flaggedN ? (ar ? 'دون عتبة ٩٠٪ · مهمة للفريق' : 'under 90% · task for the team') : (ar ? 'لا شيء دون العتبة' : 'none under threshold'), color: flaggedN ? '#A8323E' : '#1F6F5B' }
+        { label: ar ? 'متوسط الفترة' : 'Period average', value: this.nd(avg(demo).toFixed(1) + '%'), note: ar ? 'خط الأساس الشخصي' : 'personal baseline', color: '#6B5C70' },
+        { label: ar ? 'أدنى قراءة' : 'Lowest reading', value: this.nd(Math.min(...demo).toFixed(1) + '%'), note: ar ? 'في نافذة ' + this.nd(s.range) + ' يومًا' : 'in the ' + s.range + '-day window', color: '#6B5C70' },
+        { label: t.flagged, value: this.nd(flaggedN), note: flaggedN ? (ar ? 'دون عتبة ٩٠٪ · مهمة للفريق' : 'under 90% · task for the team') : (ar ? 'لا شيء دون العتبة' : 'none under threshold'), color: flaggedN ? '#A8323E' : '#1F6F5B' }
       ],
-      problems: c.problems.map((p, i) => ({ ...p, n: String(i + 1).padStart(2, '0'), delay: delay(i) })),
+      problems: c.problems.map((p, i) => ({ ...p, n: this.nd(String(i + 1).padStart(2, '0')), delay: delay(i) })),
       measures: c.measures, zones: c.zones,
-      steps: c.steps.map((x, i) => ({ ...x, n: i + 1, delay: delay(i) })), records: c.records.map((x, i) => ({ ...x, delay: delay(i) })),
+      steps: c.steps.map((x, i) => ({ ...x, n: this.nd(i + 1), delay: delay(i) })), records: c.records.map((x, i) => ({ ...x, delay: delay(i) })),
       pillars: c.pillars.map((p, i) => ({ ...p, delay: delay(i) })),
-      whys: c.whys.map((w, i) => ({ ...w, n: String(i + 1).padStart(2, '0') })),
+      whys: c.whys.map((w, i) => ({ ...w, n: this.nd(String(i + 1).padStart(2, '0')) })),
       phases: c.phases.map((p, i) => ({ ...p, delay: delay(i), line: i === 0 ? '#4F2D57' : '#D9CCE3', bg: i === 0 ? '#4F2D57' : '#EDE6F2', fg: i === 0 ? '#FAF7F3' : '#4F2D57' })),
       faqs: c.faqs.map((f, i) => ({ ...f, toggle: () => this.setState({ openFaq: s.openFaq === i ? -1 : i }), rot: s.openFaq === i ? 'rotate(45deg)' : 'none', rows: s.openFaq === i ? '1fr' : '0fr' }))
     };

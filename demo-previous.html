@@ -100,7 +100,7 @@ h3.cardt{margin:0 0 4px;font-family:'Newsreader','Amiri',serif;font-weight:400;f
 .mut{color:var(--mut)}
 .tiny{font-size:12px;color:var(--mut);line-height:1.55}
 </style>
-<link rel="stylesheet" href="demo-enhancements.css">
+<link rel="stylesheet" href="demo-previous.css">
 </head>
 <body>
 
@@ -1058,7 +1058,7 @@ function patientSays(text, opts={}){
   const hits=matchKeywords(text), seen=new Set();
   for(const h of hits){
     if(seen.has(h.rule.action)) continue; seen.add(h.rule.action);
-    log('alert', ()=>t('eKwMatch')(h.word, t(ALABEL[h.rule.action])), null, {matchedKeyword:{word:h.word, rule:JSON.parse(JSON.stringify(h.rule)), patientText:text}});
+    log('alert', ()=>t('eKwMatch')(h.word, t(ALABEL[h.rule.action])));
     const done=execKeywordAction(h.rule, h.word, m);
     const rule=h.rule, sayNow=(rule.say&&(rule.say[L]||rule.say.en))||'';
     if(sayNow){ addJ({who:'a', mk:()=>((rule.say&&(rule.say[L]||rule.say.en))||sayNow)+(done===false?' '+t('jHeld'):''), m}); speak(sayNow); }
@@ -1178,6 +1178,6 @@ setInterval(()=>{
   if(S.alarm && AC && Date.now()-S.lastBeep>8000){ S.lastBeep=Date.now(); beep(2); }
 },500);
 </script>
-<script src="demo-enhancements.js"></script>
+<script src="demo-previous.js"></script>
 </body>
 </html>

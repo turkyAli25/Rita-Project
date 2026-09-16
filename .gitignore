@@ -4,3 +4,12 @@
 
 # Source documents — investor brief and project drafts (kept out of the repo)
 uploads/
+
+# Local accounts, health readings, device keys, TLS keys and private build snapshots
+.riati/
+work/
+__pycache__/
+*.pyc
+
+# macOS sandbox temp copies of media files
+*.sb-*
