@@ -1,78 +1,78 @@
 {
  "fps": 30,
- "total": 37.96,
- "frames": 1139,
+ "total": 39.16,
+ "frames": 1175,
  "scenes": [
   {
    "id": "connect",
    "index": 1,
    "text": "رئتي تربط المريض بطبيبه، كل يوم.",
    "start": 0,
-   "end": 4.29,
+   "end": 4.48,
    "audio": {
-    "file": "video/story/voice/take/line1.m4a",
+    "file": "video/story/voice/take2/line1.m4a",
     "start": 0.3,
-    "duration": 3.74
+    "duration": 3.93
    }
   },
   {
    "id": "readings",
    "index": 2,
    "text": "قراءاته من المنزل تصل في سجل واحد.",
-   "start": 4.29,
-   "end": 8.47,
+   "start": 4.48,
+   "end": 8.95,
    "audio": {
-    "file": "video/story/voice/take/line2.m4a",
-    "start": 4.59,
-    "duration": 3.63
+    "file": "video/story/voice/take2/line2.m4a",
+    "start": 4.78,
+    "duration": 3.92
    }
   },
   {
    "id": "ai",
    "index": 3,
    "text": "والذكاء الاصطناعي يراقب، ويرفع التقرير للطبيب في موعده.",
-   "start": 8.47,
-   "end": 15.03,
+   "start": 8.95,
+   "end": 15.35,
    "audio": {
-    "file": "video/story/voice/take/line3.m4a",
-    "start": 8.77,
-    "duration": 6.01
+    "file": "video/story/voice/take2/line3.m4a",
+    "start": 9.25,
+    "duration": 5.85
    }
   },
   {
    "id": "orders",
    "index": 4,
    "text": "وفي الحالات الطارئة، يحدد الطبيب خطة معينة تصل إلى المريض في الوقت نفسه، وينفّذ تعليماته فورًا.",
-   "start": 15.03,
-   "end": 25.3,
+   "start": 15.35,
+   "end": 25.84,
    "audio": {
-    "file": "video/story/voice/take/line4.m4a",
-    "start": 15.33,
-    "duration": 9.72
+    "file": "video/story/voice/take2/line4.m4a",
+    "start": 15.65,
+    "duration": 9.94
    }
   },
   {
    "id": "journal",
    "index": 5,
    "text": "وللمريض مساحته: يصف أعراضه، ويعطي رأيه بحرية.",
-   "start": 25.3,
-   "end": 31.56,
+   "start": 25.84,
+   "end": 32.14,
    "audio": {
-    "file": "video/story/voice/take/line5.m4a",
-    "start": 25.6,
-    "duration": 5.71
+    "file": "video/story/voice/take2/line5.m4a",
+    "start": 26.14,
+    "duration": 5.75
    }
   },
   {
    "id": "close",
    "index": 6,
    "text": "رئتي. رعاية مستمرة، لمرض لا يتوقف.",
-   "start": 31.56,
-   "end": 37.96,
+   "start": 32.14,
+   "end": 39.16,
    "audio": {
-    "file": "video/story/voice/take/line6.m4a",
-    "start": 31.86,
-    "duration": 4.45
+    "file": "video/story/voice/take2/line6.m4a",
+    "start": 32.44,
+    "duration": 5.07
    }
   }
  ],
