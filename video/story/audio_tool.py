@@ -81,7 +81,7 @@ def istft(S, win, length):
     out /= np.maximum(wsum, 1e-3)
     return out[N // 2:N // 2 + length]
 
-def enhance(x, sr, nr_db=14.0, hp=85.0, presence_db=2.5, rms_target=-19.0, peak=-1.0, shelf_db=0.0, lowmid_db=0.0):
+def enhance(x, sr, nr_db=14.0, hp=85.0, presence_db=2.5, rms_target=-19.0, peak=-1.0, shelf_db=0.0, lowmid_db=0.0, ratio=3.0, thr=-22.0):
     S, win = stft(x)
     mag = np.abs(S)
     freqs = np.fft.rfftfreq(N, 1 / sr)
@@ -112,8 +112,8 @@ def enhance(x, sr, nr_db=14.0, hp=85.0, presence_db=2.5, rms_target=-19.0, peak=
     ay = np.abs(y); e = 0.0
     for i in range(len(y)):                            # ~1.9 M samples: fine
         v = ay[i]; e = a_att * e + (1 - a_att) * v if v > e else a_rel * e + (1 - a_rel) * v; env[i] = e
-    edb = db(env); thr = -22.0; over = np.maximum(edb - thr, 0)
-    y = y * 10 ** (-(over * (1 - 1 / 3.0)) / 20)
+    edb = db(env); over = np.maximum(edb - thr, 0)
+    y = y * 10 ** (-(over * (1 - 1 / ratio)) / 20)
     # --- level: speech RMS to target, then a look-ahead peak limiter
     segs, *_ = segments(y, sr)
     act = np.concatenate([y[int(s * sr):int(e * sr)] for s, e in segs]) if segs else y
@@ -137,10 +137,10 @@ def cmd_analyze(path):
     print(json.dumps({'segments': segs}))
 
 def cmd_enhance(inp, out, args):
-    opts = {'nr': 14.0, 'hp': 85.0, 'presence': 2.5, 'rms': -19.0, 'peak': -1.0, 'shelf': 0.0, 'lowmid': 0.0}
+    opts = {'nr': 14.0, 'hp': 85.0, 'presence': 2.5, 'rms': -19.0, 'peak': -1.0, 'shelf': 0.0, 'lowmid': 0.0, 'ratio': 3.0, 'thr': -22.0}
     for i in range(0, len(args), 2): opts[args[i].lstrip('-')] = float(args[i + 1])
     x, sr = read_wav(inp)
-    y = enhance(x, sr, opts['nr'], opts['hp'], opts['presence'], opts['rms'], opts['peak'], opts['shelf'], opts['lowmid'])
+    y = enhance(x, sr, opts['nr'], opts['hp'], opts['presence'], opts['rms'], opts['peak'], opts['shelf'], opts['lowmid'], opts['ratio'], opts['thr'])
     write_wav(out, y, sr)
     print(f'wrote {out}: peak {db(np.abs(y).max()):.1f} dBFS, options {opts}')
 
