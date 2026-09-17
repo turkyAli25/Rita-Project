@@ -1,105 +1,85 @@
 {
  "fps": 30,
- "total": 40.09,
- "frames": 1203,
+ "total": 37.72,
+ "frames": 1132,
  "scenes": [
   {
    "id": "connect",
    "index": 1,
    "text": "رئتي تربط المريض بطبيبه، كل يوم.",
    "start": 0,
-   "end": 4.57,
+   "end": 4.29,
    "audio": {
     "file": "video/story/voice/take/line1.m4a",
     "start": 0.3,
-    "duration": 4.02
+    "duration": 3.74
    }
   },
   {
    "id": "readings",
    "index": 2,
    "text": "قراءاته من المنزل تصل في سجل واحد.",
-   "start": 4.57,
-   "end": 8.93,
+   "start": 4.29,
+   "end": 8.38,
    "audio": {
     "file": "video/story/voice/take/line2.m4a",
-    "start": 4.87,
-    "duration": 3.81
+    "start": 4.59,
+    "duration": 3.54
    }
   },
   {
    "id": "ai",
    "index": 3,
    "text": "والذكاء الاصطناعي يراقب، ويرفع التقرير للطبيب في موعده.",
-   "start": 8.93,
-   "end": 15.8,
+   "start": 8.38,
+   "end": 14.85,
    "audio": {
     "file": "video/story/voice/take/line3.m4a",
-    "start": 9.23,
-    "duration": 6.32
+    "start": 8.68,
+    "duration": 5.92
    }
   },
   {
    "id": "orders",
    "index": 4,
    "text": "وفي الحالات الطارئة، يحدد الطبيب خطة معينة تصل إلى المريض في الوقت نفسه، وينفّذ تعليماته فورًا.",
-   "start": 15.8,
-   "end": 26.77,
+   "start": 14.85,
+   "end": 25.12,
    "audio": {
     "file": "video/story/voice/take/line4.m4a",
-    "start": 16.1,
-    "duration": 10.42
+    "start": 15.15,
+    "duration": 9.72
    }
   },
   {
    "id": "journal",
    "index": 5,
    "text": "وللمريض مساحته: يصف أعراضه، ويعطي رأيه بحرية.",
-   "start": 26.77,
-   "end": 33.41,
+   "start": 25.12,
+   "end": 31.37,
    "audio": {
     "file": "video/story/voice/take/line5.m4a",
-    "start": 27.07,
-    "duration": 6.09
+    "start": 25.42,
+    "duration": 5.7
    }
   },
   {
    "id": "close",
    "index": 6,
    "text": "رئتي. رعاية مستمرة، لمرض لا يتوقف.",
-   "start": 33.41,
-   "end": 40.09,
+   "start": 31.37,
+   "end": 37.72,
    "audio": {
     "file": "video/story/voice/take/line6.m4a",
-    "start": 33.71,
-    "duration": 4.73
+    "start": 31.67,
+    "duration": 4.4
    }
   }
  ],
  "clips": [
   {
-   "file": "video/story/voice/take/line1.m4a",
-   "start": 0.3
-  },
-  {
-   "file": "video/story/voice/take/line2.m4a",
-   "start": 4.87
-  },
-  {
-   "file": "video/story/voice/take/line3.m4a",
-   "start": 9.23
-  },
-  {
-   "file": "video/story/voice/take/line4.m4a",
-   "start": 16.1
-  },
-  {
-   "file": "video/story/voice/take/line5.m4a",
-   "start": 27.07
-  },
-  {
-   "file": "video/story/voice/take/line6.m4a",
-   "start": 33.71
+   "file": "video/story/narration.wav",
+   "start": 0
   }
  ]
 }

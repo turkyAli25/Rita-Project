@@ -4,6 +4,7 @@
   python3 video/story/audio_tool.py analyze  in.wav                       # levels, noise floor, speech segments, pauses
   python3 video/story/audio_tool.py enhance  in.wav out.wav [--nr 14] [--hp 85] [--presence 2.5] [--rms -19]
   python3 video/story/audio_tool.py split    in.wav outdir b1,b2,...     # cut at boundary times (s) → line1.wav … + .m4a
+  python3 video/story/audio_tool.py mixdown  timeline.json narration.wav # one continuous track from the timeline clips (for the mux)
 
 Decode first with:  afconvert -f WAVE -d LEI16@48000 take.m4a take.wav
 """
@@ -80,7 +81,7 @@ def istft(S, win, length):
     out /= np.maximum(wsum, 1e-3)
     return out[N // 2:N // 2 + length]
 
-def enhance(x, sr, nr_db=14.0, hp=85.0, presence_db=2.5, rms_target=-19.0, peak=-1.0):
+def enhance(x, sr, nr_db=14.0, hp=85.0, presence_db=2.5, rms_target=-19.0, peak=-1.0, shelf_db=0.0, lowmid_db=0.0):
     S, win = stft(x)
     mag = np.abs(S)
     freqs = np.fft.rfftfreq(N, 1 / sr)
@@ -102,7 +103,9 @@ def enhance(x, sr, nr_db=14.0, hp=85.0, presence_db=2.5, rms_target=-19.0, peak=
     hp_gain = 1 / np.sqrt(1 + (hp / f) ** 4)
     bell = 10 ** ((presence_db * np.exp(-(np.log2(f / 3000.0) ** 2) / (2 * 0.6 ** 2))) / 20)
     lp_gain = 1 / np.sqrt(1 + (f / 14000.0) ** 6)
-    S = S * gain * (hp_gain * bell * lp_gain)[None, :]
+    air = 10 ** ((shelf_db / (1 + (7000.0 / f) ** 4)) / 20)                                        # high shelf above ~7 kHz
+    lowmid = 10 ** ((lowmid_db * np.exp(-(np.log2(f / 250.0) ** 2) / (2 * 0.7 ** 2))) / 20)         # bell at 250 Hz (cut to lift muddiness)
+    S = S * gain * (hp_gain * bell * lp_gain * air * lowmid)[None, :]
     y = istft(S, win, len(x))
     # --- compressor: 3:1 above -22 dBFS on a 5 ms / 120 ms envelope
     env = np.zeros_like(y); a_att, a_rel = np.exp(-1 / (0.005 * sr)), np.exp(-1 / (0.120 * sr))
@@ -134,12 +137,33 @@ def cmd_analyze(path):
     print(json.dumps({'segments': segs}))
 
 def cmd_enhance(inp, out, args):
-    opts = {'nr': 14.0, 'hp': 85.0, 'presence': 2.5, 'rms': -19.0}
+    opts = {'nr': 14.0, 'hp': 85.0, 'presence': 2.5, 'rms': -19.0, 'peak': -1.0, 'shelf': 0.0, 'lowmid': 0.0}
     for i in range(0, len(args), 2): opts[args[i].lstrip('-')] = float(args[i + 1])
     x, sr = read_wav(inp)
-    y = enhance(x, sr, opts['nr'], opts['hp'], opts['presence'], opts['rms'])
+    y = enhance(x, sr, opts['nr'], opts['hp'], opts['presence'], opts['rms'], opts['peak'], opts['shelf'], opts['lowmid'])
     write_wav(out, y, sr)
     print(f'wrote {out}: peak {db(np.abs(y).max()):.1f} dBFS, options {opts}')
+
+def cmd_mixdown(timeline_path, out_wav):
+    """One continuous narration track for the mux: clips placed at their timeline starts, silence between.
+    A composition with gaps stores them as empty edits, and players that ignore edit lists (Chromium-based
+    ones included) play the first slice of the track in every gap instead."""
+    import tempfile
+    tl = json.load(open(timeline_path))
+    sr = 48000; total = int(round(tl['total'] * sr)); y = np.zeros(total, dtype=np.float32)
+    for c in tl['clips']:
+        src = c['file']
+        if not src.endswith('.wav'):
+            tmp = tempfile.NamedTemporaryFile(suffix='.wav', delete=False).name
+            subprocess.run(['afconvert', src, '-f', 'WAVE', '-d', 'LEI16', tmp], check=True); src = tmp
+        x, s = read_wav(src)
+        if s != sr: raise SystemExit(f'{c["file"]}: {s} Hz, expected {sr}')
+        st = int(round(c['start'] * sr)); n = min(len(x), total - st)
+        y[st:st + n] += x[:n]
+    write_wav(out_wav, y, sr)
+    tl['clips'] = [{'file': os.path.relpath(out_wav), 'start': 0}]
+    json.dump(tl, open(timeline_path, 'w'), indent=1, ensure_ascii=False)
+    print(f'mixdown {out_wav}: {total / sr:.2f}s, peak {db(np.abs(y).max()):.1f} dBFS; timeline clips → single track')
 
 def cmd_split(inp, outdir, bounds):
     x, sr = read_wav(inp)
@@ -164,4 +188,5 @@ if __name__ == '__main__':
     if a[0] == 'analyze': cmd_analyze(a[1])
     elif a[0] == 'enhance': cmd_enhance(a[1], a[2], a[3:])
     elif a[0] == 'split': cmd_split(a[1], a[2], a[3])
+    elif a[0] == 'mixdown': cmd_mixdown(a[1], a[2])
     else: raise SystemExit(__doc__)

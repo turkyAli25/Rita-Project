@@ -12,6 +12,7 @@ curl -s -o /dev/null --max-time 3 http://localhost:8735/demo.html || { (nohup py
 [ -x video/story/encode ] || swiftc -swift-version 5 -O video/story/encode.swift -o video/story/encode
 [ -x video/story/mux ]    || swiftc -swift-version 5 -O video/story/mux.swift    -o video/story/mux
 echo "--- timeline ---";  node video/story/build_timeline.cjs "$DIR" "$LIST"
+echo "--- mixdown ---";   python3 video/story/audio_tool.py mixdown video/story/timeline.json video/story/narration.wav
 echo "--- frames ---";    node video/story/render.cjs | tail -n 1
 FR=$(python3 -c "import json;print(json.load(open('video/story/timeline.json'))['frames'])")
 echo "--- encode ---";    ./video/story/encode video/story/frames "$FR" 30 1920 1080 video/story/silent.mp4 | tail -n 1

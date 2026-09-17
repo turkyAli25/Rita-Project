@@ -21,5 +21,7 @@ video/story/qa/
 video/story/silent.mp4
 video/story/encode
 video/story/mux
+video/story/tempo
+video/story/narration.wav
 video/outputs/*PREVIEW*
 video/story/voice/**/*.wav
