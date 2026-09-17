@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>رئتي — قصة الفيديو</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400&display=swap" rel="stylesheet">
+<style>
+:root{--aub:#4F2D57;--aub-d:#2E1834;--cream:#FAF7F3;--lilac:#EDE6F2;--line:#E6DDE9;--gold:#B8892E;--ink:#1F1520;--mut:#6B5C70;--green:#1F6F5B}
+*{box-sizing:border-box;margin:0}
+html,body{width:1920px;height:1080px;overflow:hidden;background:var(--cream);font-family:'IBM Plex Sans Arabic',system-ui,sans-serif;color:var(--ink)}
+.stage{position:relative;width:1920px;height:1080px;overflow:hidden}
+.scene{position:absolute;inset:0;opacity:0;will-change:opacity,transform}
+.glow{position:absolute;width:1100px;height:1100px;border-radius:50%;background:radial-gradient(circle,#E3D6EA 0%,rgba(250,247,243,0) 68%);pointer-events:none}
+.serif{font-family:'Amiri','Newsreader',serif;font-weight:400}
+.kicker{font-size:26px;letter-spacing:.12em;color:var(--gold);font-weight:600}
+.h1{font-size:92px;line-height:1.15;color:var(--aub-d)}
+.h2{font-size:64px;line-height:1.2;color:var(--aub-d)}
+.lead{font-size:34px;line-height:1.6;color:#4A3B4E}
+.card{background:#fff;border:1px solid var(--line);border-radius:28px;box-shadow:0 40px 80px -40px rgba(79,45,87,.35)}
+.shot{position:absolute;overflow:hidden;border-radius:26px;border:1px solid var(--line);background:#fff;box-shadow:0 50px 100px -50px rgba(46,24,52,.45);transform-origin:100% 0;will-change:transform,opacity}   /* whole-card zooms grow leftwards into free space, so nothing inside is ever cropped */
+.shot img{display:block;width:100%;transform-origin:100% 0;will-change:transform}   /* right-to-left: zoom grows leftwards so the leading edge never clips */
+.pill{display:inline-flex;align-items:center;gap:12px;border-radius:999px;padding:12px 24px;font-size:26px;font-weight:600}
+.pill.g{background:#E6F2EE;color:var(--green)}
+.pill.d{background:var(--aub-d);color:var(--cream)}
+.tag{position:absolute;background:var(--aub-d);color:var(--cream);border-radius:22px;padding:22px 30px;font-size:30px;line-height:1.5;max-width:640px;box-shadow:0 30px 60px -30px rgba(0,0,0,.5);will-change:transform,opacity}
+.tag .k{display:block;font-size:20px;letter-spacing:.1em;color:#D4B26A;font-weight:600;margin-bottom:6px}
+#caption{position:absolute;left:0;right:0;bottom:0;padding:34px 120px 40px;background:linear-gradient(to top,rgba(46,24,52,.96),rgba(46,24,52,.82) 70%,rgba(46,24,52,0));text-align:center;color:var(--cream);font-size:40px;line-height:1.55;font-weight:500;opacity:0}
+#caption span{display:inline-block;padding:0 6px}
+.logo{display:flex;align-items:center;gap:22px}
+.logo img{width:110px;height:110px;object-fit:contain}
+.logo .name{font-family:'Newsreader',serif;font-size:60px;color:var(--aub)}
+.logo .name b{font-family:'Amiri',serif;font-weight:400;color:var(--aub-d)}
+.link{position:absolute;bottom:0;left:0;right:0;height:14px;background:linear-gradient(90deg,var(--gold),#E3C57F);transform-origin:100% 50%}
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+
+<!-- 1 · connect: patient ↔ doctor -->
+<section class="scene" id="s1">
+  <div class="glow" style="right:-260px;top:-320px"></div>
+  <div style="position:absolute;top:120px;right:160px" class="logo"><img src="/assets/logo.png" alt=""><div class="name">Riati <span style="color:var(--gold);font-weight:300">|</span> <b>رئتي</b></div></div>
+  <div style="position:absolute;top:290px;right:160px;width:900px">
+    <div class="kicker">صحة الجهاز التنفسي · متابعة منزلية</div>
+    <div class="serif h1" style="margin-top:18px">تربط المريض بطبيبه<br>كل يوم.</div>
+  </div>
+  <div style="position:absolute;top:640px;right:160px;left:160px;display:flex;align-items:center;gap:0">
+    <div class="card" id="s1-patient" style="width:520px;padding:34px 38px">
+      <div class="kicker" style="font-size:22px">المريض</div>
+      <div class="serif h2" style="font-size:54px;margin-top:8px">في المنزل</div>
+      <div class="lead" style="font-size:28px;margin-top:10px">قراءات يومية · أعراض · ملاحظات</div>
+    </div>
+    <div style="flex:1;position:relative;height:14px;margin:0 30px"><div class="link" id="s1-link"></div></div>
+    <div class="card" id="s1-doctor" style="width:520px;padding:34px 38px">
+      <div class="kicker" style="font-size:22px">الطبيب</div>
+      <div class="serif h2" style="font-size:54px;margin-top:8px">في العيادة</div>
+      <div class="lead" style="font-size:28px;margin-top:10px">سجل واحد · تقارير · أوامر موقّعة</div>
+    </div>
+  </div>
+</section>
+
+<!-- 2 · readings: home vitals → doctor's record -->
+<section class="scene" id="s2">
+  <div class="glow" style="left:-300px;bottom:-400px"></div>
+  <div style="position:absolute;top:90px;right:140px;width:800px"><div class="kicker">من المنزل إلى الطبيب</div><div class="serif h2" style="margin-top:12px">القراءات تصل إلى سجل واحد</div></div>
+  <div class="shot" id="s2-tiles" style="right:140px;top:270px;width:980px;height:306px"><img src="shots/tiles.png" alt=""></div>
+  <div class="shot" id="s2-chart" style="right:140px;top:600px;width:980px;height:330px"><img src="shots/chart.png" alt=""></div>
+  <div class="shot" id="s2-report" style="left:90px;top:400px;width:660px;height:334px"><img src="shots/report.png" alt=""></div>
+  <div class="tag" id="s2-tag" style="left:120px;top:270px"><span class="k">عند الطبيب</span>تقرير في موعده: القراءات، مداها، واتجاهها</div>
+</section>
+
+<!-- 3 · AI monitors and reports -->
+<section class="scene" id="s3">
+  <div class="glow" style="right:-300px;top:-300px"></div>
+  <div style="position:absolute;top:90px;right:140px;width:900px"><div class="kicker">الذكاء الاصطناعي</div><div class="serif h2" style="margin-top:12px">يراقب لحظة بلحظة، ويرفع التقرير في موعده</div></div>
+  <div class="shot" id="s3-ai" style="right:140px;top:280px;width:800px;height:520px"><img src="shots/ai.png" alt=""></div>
+  <div class="shot" id="s3-events" style="left:120px;top:240px;width:640px;height:740px"><img src="shots/cx-events.png" alt=""></div>
+</section>
+
+<!-- 4 · doctor's standing orders executed -->
+<section class="scene" id="s4">
+  <div class="glow" style="left:-300px;top:-300px"></div>
+  <div style="position:absolute;top:90px;right:140px;width:1100px"><div class="kicker">أوامر الطبيب الدائمة</div><div class="serif h2" style="margin-top:12px">حالة حددها الطبيب مسبقًا ← تنفيذ فوري</div></div>
+  <div class="shot" id="s4-orders" style="right:140px;top:280px;width:860px;height:660px"><img src="shots/orders.png" alt=""></div>
+  <div class="shot" id="s4-alert" style="left:120px;top:330px;width:700px;height:70px"><img src="shots/alert.png" alt=""></div>
+  <div class="shot" id="s4-therapy" style="left:120px;top:430px;width:700px;height:90px"><img src="shots/therapy.png" alt=""></div>
+  <div class="tag" id="s4-tag" style="left:150px;top:580px"><span class="k">وتعليمات فورية إلى المريض</span>خذ بختين من البخاخ المُسعف الآن، واجلس منتصبًا وتنفّس ببطء.</div>
+</section>
+
+<!-- 5 · the patient's own space -->
+<section class="scene" id="s5">
+  <div class="glow" style="right:-300px;bottom:-400px"></div>
+  <div style="position:absolute;top:90px;right:140px;width:900px"><div class="kicker">مساحة المريض</div><div class="serif h2" style="margin-top:12px">يكتب أو يقول كيف يشعر، وبأي درجة</div></div>
+  <div class="shot" id="s5-journal" style="right:140px;top:280px;width:900px"><img src="shots/journal.png" alt=""></div>
+  <div style="position:absolute;left:140px;top:300px;width:620px;display:flex;flex-direction:column;gap:22px" id="s5-pills">
+    <div class="pill d" style="align-self:flex-start">«أشعر بضيق نفس»</div>
+    <div class="pill g" style="align-self:flex-end">درجة ضيق النفس: ٥ من ١٠</div>
+    <div class="pill d" style="align-self:flex-start">«تحسنت، والتنفس أسهل»</div>
+    <div class="lead" style="font-size:30px;margin-top:10px">كل كلمة تُقرأ فورًا… ويُسمع صوته قبل أن تتحول الإشارة إلى أزمة.</div>
+  </div>
+</section>
+
+<!-- 6 · close -->
+<section class="scene" id="s6">
+  <div class="glow" style="left:410px;top:-60px"></div>
+  <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px">
+    <div class="logo" id="s6-logo"><img src="/assets/logo.png" alt="" style="width:150px;height:150px"><div class="name" style="font-size:84px">Riati <span style="color:var(--gold);font-weight:300">|</span> <b>رئتي</b></div></div>
+    <div class="serif h1" id="s6-title" style="font-size:80px;text-align:center">رعاية مستمرة،<br>لمرض لا يتوقف.</div>
+    <div class="kicker" id="s6-url" style="font-size:30px;letter-spacing:.2em">raitie.com</div>
+  </div>
+</section>
+
+<div id="caption"><span id="captionText"></span></div>
+</div>
+
+<script>
+'use strict';
+const $ = id => document.getElementById(id);
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const ease = u => u < .5 ? 4*u*u*u : 1 - Math.pow(-2*u+2, 3)/2;        // ease-in-out cubic
+const out = u => 1 - Math.pow(1-u, 3);                                   // ease-out cubic
+const FADE = 0.6;
+let tl = null;
+fetch('timeline.json').then(r => r.json()).then(j => { tl = j; window.storyReady = true; });
+
+// per-scene motion: u = progress 0..1 inside the scene, e = seconds since the scene began
+const motion = {
+  s1(u, e){ $('s1-link').style.transform = 'scaleX(' + out(clamp((e-0.9)/1.2,0,1)) + ')';
+            $('s1-patient').style.transform = 'translateY(' + (30*(1-out(clamp(e/0.8,0,1)))) + 'px)';
+            $('s1-doctor').style.transform  = 'translateY(' + (30*(1-out(clamp((e-0.5)/0.8,0,1)))) + 'px)'; },
+  s2(u, e){ $('s2-tiles').style.transform = 'scale(' + (1.0 + 0.03*u) + ')';
+            const c = out(clamp((e-0.7)/0.8,0,1)); $('s2-chart').style.opacity = c; $('s2-chart').style.transform = 'translateY(' + (40*(1-c)) + 'px)';
+            const r = out(clamp((e-1.4)/0.9,0,1)); $('s2-report').style.transform = 'translateY(' + (60*(1-r)) + 'px)'; $('s2-report').style.opacity = r;
+            $('s2-tag').style.opacity = out(clamp((e-2.2)/0.6,0,1)); $('s2-tag').style.transform = 'translateY(' + (20*(1-out(clamp((e-2.2)/0.6,0,1)))) + 'px)'; },
+  s3(u, e){ $('s3-ai').style.transform = 'scale(' + (1.0 + 0.04*u) + ')';
+            const r = out(clamp((e-1.2)/0.9,0,1)); $('s3-events').style.transform = 'translateY(' + (60*(1-r)) + 'px)'; $('s3-events').style.opacity = r;
+            $('s3-events').firstElementChild.style.transform = 'translateY(' + (-140*u) + 'px)'; },
+  s4(u, e){ $('s4-orders').firstElementChild.style.transform = 'scale(' + (1.12 + 0.05*u) + ') translateY(' + (-90 - 40*u) + 'px)';
+            const a = out(clamp((e-1.0)/0.6,0,1)), t = out(clamp((e-1.9)/0.6,0,1)), g = out(clamp((e-3.0)/0.7,0,1));
+            $('s4-alert').style.opacity = a;   $('s4-alert').style.transform   = 'translateX(' + (-50*(1-a)) + 'px)';
+            $('s4-therapy').style.opacity = t; $('s4-therapy').style.transform = 'translateX(' + (-50*(1-t)) + 'px)';
+            $('s4-tag').style.opacity = g;     $('s4-tag').style.transform     = 'translateY(' + (24*(1-g)) + 'px)'; },
+  s5(u, e){ $('s5-journal').style.transform = 'scale(' + (1.0 + 0.04*u) + ')';
+            [...$('s5-pills').children].forEach((el, i) => { const r = out(clamp((e-0.8-i*0.9)/0.6,0,1)); el.style.opacity = r; el.style.transform = 'translateY(' + (24*(1-r)) + 'px)'; }); },
+  s6(u, e){ const l = out(clamp(e/0.9,0,1)), t = out(clamp((e-0.6)/0.9,0,1)), k = out(clamp((e-1.4)/0.8,0,1));
+            $('s6-logo').style.opacity = l;  $('s6-logo').style.transform  = 'scale(' + (0.92+0.08*l) + ')';
+            $('s6-title').style.opacity = t; $('s6-title').style.transform = 'translateY(' + (24*(1-t)) + 'px)';
+            $('s6-url').style.opacity = k; }
+};
+
+window.seek = function(t){
+  if(!tl) return;
+  const scenes = tl.scenes;
+  let current = 0;
+  scenes.forEach((s, i) => {
+    const el = $('s' + (i+1));
+    const start = s.start, next = scenes[i+1] ? scenes[i+1].start : tl.total;
+    let op = 0;
+    if (t >= start) { op = i === 0 ? 1 : clamp((t - start) / FADE, 0, 1); if (t >= next + FADE) op = 0; }
+    el.style.opacity = op; el.style.zIndex = 10 + i;
+    if (op > 0) { const e = t - start; const u = clamp(e / Math.max(0.001, s.end - start), 0, 1); motion['s' + (i+1)](u, e); }
+    if (t >= start) current = i;
+  });
+  // caption: the narration line of the current scene, shown with its audio, faded at the edges
+  const s = scenes[current], a = s.audio;
+  const cap = $('caption');
+  const vis = t >= a.start - 0.25 && t <= a.start + a.duration + 0.55;
+  const capOp = vis ? Math.min(clamp((t - (a.start - 0.25)) / 0.35, 0, 1), clamp((a.start + a.duration + 0.55 - t) / 0.4, 0, 1)) : 0;
+  $('captionText').textContent = s.text; cap.style.opacity = capOp;
+};
+</script>
+</body>
+</html>

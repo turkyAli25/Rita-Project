@@ -13,3 +13,12 @@ __pycache__/
 
 # macOS sandbox temp copies of media files
 *.sb-*
+
+# Video render scratch (rebuilt by video/story/finalize.sh); the storyboard sources, shots and narration stay tracked
+video/work*/
+video/story/frames/
+video/story/qa/
+video/story/silent.mp4
+video/story/encode
+video/story/mux
+video/outputs/*PREVIEW*
