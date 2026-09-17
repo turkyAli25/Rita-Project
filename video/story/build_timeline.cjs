@@ -6,7 +6,7 @@ const [voiceDir, list] = process.argv.slice(2);
 const script = JSON.parse(fs.readFileSync(path.join(__dirname, 'script.json'), 'utf8'));
 const files = list.split(',');
 const dur = f => parseFloat(execSync(`afinfo "${f}"`).toString().match(/estimated duration: ([\d.]+)/)[1]);
-const LEAD = 0.4, GAP = 0.3, TAIL = 1.4, FPS = 30;   // tight pauses: six lines at the narrator's pace land near 35 s
+const LEAD = 0.3, GAP = 0.25, TAIL = 1.4, FPS = 30;   // clips carry 80 ms of room on each side, so this reads as a natural ~0.7 s pause between lines
 let t = 0; const scenes = [];
 script.lines.forEach((line, i) => {
   const file = path.join(voiceDir, files[i]); const d = dur(file);
