@@ -1,14 +1,15 @@
 // Pitch-preserving tempo change through AVAudioUnitTimePitch, rendered offline.
-// usage: tempo <in.wav> <out.wav> <rate>      (rate 1.08 = 8 % faster, same pitch)
+// usage: tempo <in.wav> <out.wav> <rate> [cents]   (rate 1.08 = 8 % faster; cents shifts pitch, 100 = one semitone, negative = deeper)
 import Foundation
 import AVFoundation
 
 let a = CommandLine.arguments
-guard a.count == 4, let rate = Float(a[3]) else { print("usage: tempo <in.wav> <out.wav> <rate>"); exit(2) }
+guard a.count >= 4, let rate = Float(a[3]) else { print("usage: tempo <in.wav> <out.wav> <rate> [cents]"); exit(2) }
+let cents = a.count > 4 ? (Float(a[4]) ?? 0) : 0
 let file = try AVAudioFile(forReading: URL(fileURLWithPath: a[1]))
 let fmt = file.processingFormat
 let engine = AVAudioEngine(), player = AVAudioPlayerNode(), tp = AVAudioUnitTimePitch()
-tp.rate = rate; tp.pitch = 0; tp.overlap = 8
+tp.rate = rate; tp.pitch = cents; tp.overlap = 8
 engine.attach(player); engine.attach(tp)
 engine.connect(player, to: tp, format: fmt)
 engine.connect(tp, to: engine.mainMixerNode, format: fmt)
@@ -29,7 +30,7 @@ func render() throws {   // the writer must be released before exit, or the WAV 
     let st = try engine.renderOffline(n, to: buf)
     if st == .success { try out.write(from: buf) } else if st == .insufficientDataFromInputNode { continue } else { break }
   }
-  print(String(format: "tempo x%.2f: %.2fs → %.2fs", rate, Double(file.length) / fmt.sampleRate, Double(engine.manualRenderingSampleTime) / fmt.sampleRate))
+  print(String(format: "tempo x%.2f, pitch %+.0f cents: %.2fs → %.2fs", rate, cents, Double(file.length) / fmt.sampleRate, Double(engine.manualRenderingSampleTime) / fmt.sampleRate))
 }
 try render()
 engine.stop()
